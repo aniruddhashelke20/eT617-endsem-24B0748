@@ -9,6 +9,7 @@ export const initialState = {
   current: null, // the question on screen
   feedback: null, // last feedback shown
   lastMove: null, // 'harder' | 'alternative' | 'prerequisite'
+  focus: null, // misconception to target next
   altShownFor: null, // misconception that already got an alternative explanation
   hintsInRow: 0,
   diagnostic: null, // { score, confidence, startLevel }
