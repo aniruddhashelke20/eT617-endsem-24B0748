@@ -70,7 +70,7 @@ Summary ◄── Feedback ◄──────────────► Prac
 Teacher (PIN 617): progress · review queue (approve/override) · override level/focus · log
 About: card + roll number          Footer on every screen: 24B0748
 ```
-**C5 visibly implemented:** the Teacher link in the header opens a view with learner progress, misconception counts, hint use and time, a **review queue** of automated explanation feedback with **Approve / Override**, controls to **override the tutor's next step** (level, focus), and the attempt log. Overridden feedback appears to the learner as "📝 Your teacher reviewed your explanation".
+**C5 visibly implemented:** the Teacher link in the header opens a view with learner progress, misconception counts, hint use and time, a **review queue** of automated explanation feedback with **Approve / Override**, controls to **override the tutor's next step** (level, focus), and the attempt log. Overridden feedback appears to the learner as "📝 Your teacher reviewed one of your answers", shown together with the question, her Yes/No and her reason so it is never out of context.
 
 | Teacher view | Override | Learner sees it |
 |---|---|---|
