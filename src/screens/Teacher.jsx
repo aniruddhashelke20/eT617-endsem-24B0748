@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { MISCONCEPTIONS } from '../lib/diagnose.js'
+import { LEVEL_UP, CONCEPT } from '../lib/tutor.js'
 
 // C5 Teacher-in-the-loop: progress view + approve/override automated feedback
 // + teacher can override the tutor's next step (level, focus).
@@ -43,7 +44,7 @@ function Dashboard({ state, update, go }) {
         <dl className="facts">
           <dt>Warm-up</dt>
           <dd>{d ? `${d.score}/3 · feels ${d.confidence} · started Level ${d.startLevel}` : 'not done'}</dd>
-          <dt>Now</dt><dd>Level {state.level} · {state.streak}/2 in a row</dd>
+          <dt>Now</dt><dd>Level {state.level} · {state.streak}/{LEVEL_UP} in a row{state.retrySkill ? ` · retrying ${CONCEPT[state.retrySkill]}` : ''}</dd>
           <dt>Attempts</dt><dd>{log.length} ({right} correct)</dd>
           <dt>Hints used</dt><dd>{hinted} questions · avg {avg}s per question</dd>
         </dl>

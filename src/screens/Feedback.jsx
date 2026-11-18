@@ -17,7 +17,8 @@ export default function Feedback({ state, go, update }) {
   const yesNo = q.format === 'check' || q.format === 'spot'
   const weakReason = expl && expl.quality !== 'strong'
   const wrongVal = yesNo ? q.claimed : q.format === 'step' || q.format === 'blank' || q.format === 'findstep' ? null : parseNum(response.value)
-  const showTilt = !ok && wrongVal !== null && wrongVal !== (q.trueValue ?? q.answer)
+  const retry = move === 'retry' // first wrong on a concept: no teaching yet
+  const showTilt = !ok && !retry && wrongVal !== null && wrongVal !== (q.trueValue ?? q.answer)
   const { left, right } = sides(q.expr)
   const filled = left.replace(/(\d*)x/, (_, a) => (a ? `${a} × (${show(wrongVal)})` : `(${show(wrongVal)})`))
   const cheer = encouragement({ verdict, move, log: state.log, id: q.id })
@@ -29,7 +30,7 @@ export default function Feedback({ state, go, update }) {
         <strong>{ok && weakReason ? '✓ Right answer — now let us make your reason complete.' : ok ? '✓ Correct!' : '↻ Not yet — let us look again.'}</strong>
         {q.format === 'blank' && <p><strong>{q.blankAnswer}</strong></p>}
         {q.format === 'findstep' && <p><strong>{q.fix}</strong></p>}
-        <p>{ok ? solutionText(q) : <>You answered <strong>{yours}</strong>.</>}</p>
+        <p>{ok ? solutionText(q) : <>You answered <strong>{yours}</strong>.{retry && q.format !== 'blank' && q.format !== 'findstep' && <> The answer was <strong>{q.format === 'step' ? q.stepAnswer : (q.trueValue !== undefined && (q.format === 'spot' || q.format === 'check')) ? `${q.answer === 'yes' ? 'Yes' : 'No'} (x = ${show(q.trueValue)})` : `x = ${show(q.answer)}`}</strong>.</>}</>}</p>
       </div>
       {cheer && <p className="cheer" role="status">💪 {cheer}</p>}
 
@@ -55,7 +56,7 @@ export default function Feedback({ state, go, update }) {
           <ol className="steps">{alt.body.map((b, i) => <li key={i}>{b}</li>)}</ol>
         </>
       )}
-      {!ok && !alt && <p className="box info">{solutionText(q)}</p>}
+      {!ok && !alt && !retry && <p className="box info">{solutionText(q)}</p>}
 
       <p className="muted"><strong>Why this next step?</strong> {MOVE_REASON[move]}</p>
 
@@ -65,7 +66,7 @@ export default function Feedback({ state, go, update }) {
         <button className="btn primary" onClick={() => go('summary')}>See what I learned</button>
       ) : (
         <button className="btn primary" onClick={() => update({ screen: 'practice', feedback: null })}>
-          {move === 'alternative' ? 'Try a similar one' : move === 'harder' ? 'Next (a bit harder)' : 'Next question'}
+          {move === 'alternative' ? 'Try a similar one' : move === 'retry' ? 'Try another like this' : move === 'harder' ? 'Next (a bit harder)' : 'Next question'}
         </button>
       )}
       <button className="btn" onClick={() => go('summary')}>Stop for today</button>

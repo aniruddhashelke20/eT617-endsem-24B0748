@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Balance, { sides } from '../components/Balance.jsx'
 import { generateQuestion, show } from '../lib/generator.js'
 import { diagnose, checkExplanation } from '../lib/diagnose.js'
-import { decide } from '../lib/tutor.js'
+import { decide, LEVEL_UP, CONCEPT } from '../lib/tutor.js'
 
 const LEVEL_NAME = { 1: 'Level 1 · one-step', 2: 'Level 2 · two-step', 3: 'Level 3 · check & spot the error' }
 
@@ -10,7 +10,7 @@ export default function Practice(props) {
   const { state, update } = props
   // Generate a question if none is waiting (also on resume)
   useEffect(() => {
-    if (!state.current) update({ current: generateQuestion(state.level, state.focus) })
+    if (!state.current) update({ current: generateQuestion(state.level, state.focus, state.retrySkill) })
   }, [state.current]) // eslint-disable-line
   if (!state.current) return null
   return <QuestionCard key={state.current.id} q={state.current} {...props} />
@@ -36,7 +36,7 @@ function QuestionCard({ q, state, update }) {
     const verdict = diagnose(q, response)
     const expl = q.needsExplanation ? checkExplanation(q, text, choice) : null
     const explained = !expl || expl.quality !== 'unclear'
-    const { move, patch } = decide(state, verdict, explained)
+    const { move, patch } = decide(state, verdict, explained, q.skill)
 
     const entry = {
       id: q.id, time: new Date().toISOString(), level: q.level, skill: q.skill, format: q.format,
@@ -71,8 +71,8 @@ function QuestionCard({ q, state, update }) {
   return (
     <section className="card">
       <p className="muted">
-        {LEVEL_NAME[q.level]} · {state.streak}/2 in a row
-        {state.focus && <> · <span className="badge">practising one idea</span></>}
+        {LEVEL_NAME[q.level]} · {state.streak}/{LEVEL_UP} in a row · <span className="badge">{CONCEPT[q.skill]}</span>
+        {state.retrySkill && <> · <span className="badge">one more of the same kind</span></>}
       </p>
 
       {teacherNotes.map((e) => (

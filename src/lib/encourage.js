@@ -15,6 +15,10 @@ const OTHER = [
   'Every mistake tells us what to practise next. You have got this.',
   'Take a breath. You know more than you think.',
 ]
+const RETRY = [
+  'One slip is okay. Try another one like it — you can do this.',
+  'Everyone misses one sometimes. Let us see how the next one goes.',
+]
 const COMEBACK = [
   'You fixed it! Getting it right after a mistake is exactly how learning works.',
   'Look at that — you came back and got it. Well done for not giving up.',
@@ -30,6 +34,7 @@ export function encouragement({ verdict, move, log, id }) {
     return null
   }
   const line =
+    move === 'retry' ? pickBy(RETRY, id) :
     move === 'alternative' ? pickBy(FIRST_MIXUP, id) :
     move === 'prerequisite' && verdict !== 'unknown' ? pickBy(AGAIN, id) :
     pickBy(OTHER, id)

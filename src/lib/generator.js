@@ -147,9 +147,10 @@ function mcqOptions(q) {
 
 let counter = 0
 // focus = misconception to target next (after an alternative explanation) or null
-export function generateQuestion(level, focus = null) {
+// skillOverride: ask another question of the SAME concept (retry after a first wrong answer)
+export function generateQuestion(level, focus = null, skillOverride = null) {
   const skills = level === 1 ? ['oneAdd', 'oneMul'] : ['oneAdd', 'oneMul', 'twoStep', 'twoStep']
-  const skill = focus ? SKILL_FOR[focus] : pick(skills)
+  const skill = skillOverride ?? (focus ? SKILL_FOR[focus] : pick(skills))
   let q = MAKERS[skill](level)
   // make sure a focus question can actually show its misconception
   for (let i = 0; focus && !q.traps[focus] && i < 10; i++) q = MAKERS[skill](level)
@@ -160,7 +161,8 @@ export function generateQuestion(level, focus = null) {
     level === 1 ? ['numeric', 'step', 'mcq', 'blank'] :
     level === 2 ? ['numeric', 'mcq', 'step', 'blank', 'findstep'] :
     ['spot', 'check', 'numeric', 'findstep']
-  q.format = pick(formats)
+  // findstep always uses a two-step equation, so skip it when retrying a one-step concept
+  q.format = pick(skillOverride && skillOverride !== 'twoStep' ? formats.filter((f) => f !== 'findstep') : formats)
   if (q.format === 'mcq' || q.format === 'numeric') q.text = 'Solve for x:'
 
   if (q.format === 'mcq') q.options = mcqOptions(q)
