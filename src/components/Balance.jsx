@@ -1,7 +1,8 @@
 // Balance scale: the topic-specific tool. An equation is a balance; the beam tilts when it is not.
 // Always paired with text so meaning never depends on the picture alone.
+// tilt: 0 balanced, -1 left side heavier (left goes down), 1 right side heavier
 export default function Balance({ left, right, tilt = 0, label }) {
-  const angle = tilt * 8 // degrees; 0 = balanced
+  const angle = tilt * 8 // positive rotate = clockwise = right end goes down // degrees; 0 = balanced
   return (
     <figure className="balance">
       <svg viewBox="0 0 320 150" role="img" aria-label={label ?? `${left} equals ${right}${tilt ? ' — not balanced' : ' — balanced'}`}>

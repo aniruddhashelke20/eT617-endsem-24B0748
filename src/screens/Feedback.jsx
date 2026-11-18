@@ -30,7 +30,7 @@ export default function Feedback({ state, go, update }) {
       {showTilt && (
         <>
           <p>Let's put x = {show(wrongVal)} back in: <strong>{backCheck(q, wrongVal)}</strong>.</p>
-          <Balance left={filled} right={right} tilt={1} label={`With x = ${wrongVal} the two sides are not equal`} />
+          <Balance left={filled} right={right} tilt={q.a * wrongVal + q.b > q.c ? -1 : 1} label={`With x = ${wrongVal} the two sides are not equal`} />
         </>
       )}
 

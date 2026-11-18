@@ -46,21 +46,25 @@ export function backCheck(q, v) {
 
 // Alternative explanations, one per misconception
 export function alternativeFor(m, q) {
+  const b = q.b || 5
+  const bTxt = b > 0 ? `+ ${b}` : `− ${-b}`
+  const undo = b > 0 ? `subtract ${b}` : `add ${-b}`
+  const a = q.a > 1 ? q.a : 3
   if (m === 'M1')
     return {
       title: 'Keep the balance: do the OPPOSITE to both sides',
       body: [
         `An equation is a balance. Whatever we do to one side, we do to the other.`,
-        `To remove "+ 5", we subtract 5 (the opposite), on both sides. "Change side, change sign" is a short way of saying this.`,
+        `To remove "${bTxt}", we ${undo} (the opposite) on BOTH sides. "Change side, change sign" is a short way of saying this.`,
         solutionText(q),
       ],
     }
   if (m === 'M2')
     return {
-      title: '3x means 3 TIMES x — undo times with divide',
+      title: `${a}x means ${a} TIMES x — undo times with divide`,
       body: [
-        `3x = 12 means 3 groups of x make 12. Sharing 12 into 3 equal groups gives x = 4.`,
-        `Subtracting 3 would only take away 3, not split into 3 groups.`,
+        `${a}x means ${a} equal groups of x. To find one group, we share (divide) by ${a} on both sides.`,
+        `Subtracting ${a} only takes away ${a}; it does not split into ${a} groups.`,
         solutionText(q),
       ],
     }
