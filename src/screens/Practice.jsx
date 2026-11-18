@@ -42,7 +42,7 @@ function QuestionCard({ q, state, update }) {
       id: q.id, time: new Date().toISOString(), level: q.level, skill: q.skill, format: q.format,
       question: yesNo ? q.text : `${q.text} ${q.expr}`,
       response: yesNo ? `${choice}${text ? ` — “${text}”` : ''}` : String(response.value),
-      correct: yesNo ? `${q.answer} (x = ${show(q.trueValue)})` : q.format === 'step' ? q.stepAnswer : q.format === 'blank' ? `${q.blank.verb} ${q.blank.num}` : `x = ${show(q.answer)}`,
+      correct: yesNo ? `${q.answer} (x = ${show(q.trueValue)})` : q.format === 'step' ? q.stepAnswer : q.format === 'findstep' ? q.answer : q.format === 'blank' ? `${q.blank.verb} ${q.blank.num}` : `x = ${show(q.answer)}`,
       verdict, move, hints, seconds: Math.round((Date.now() - startedAt) / 1000),
       choice, reason: text, // kept separately so a teacher note can be shown with its context
       auto: expl, // automated feedback on the explanation
@@ -112,7 +112,13 @@ function QuestionCard({ q, state, update }) {
         </p>
       )}
 
-      {(q.format === 'mcq' || q.format === 'step') && (
+      {q.format === 'findstep' && (
+        <ol className="worked" aria-label="Worked solution">
+          {q.solSteps.map((s, i) => <li key={i}><strong>Step {i + 1}:</strong> {s}</li>)}
+        </ol>
+      )}
+
+      {(q.format === 'mcq' || q.format === 'step' || q.format === 'findstep') && (
         <div role="radiogroup" aria-label="Options" className={q.format === 'mcq' ? 'options' : ''}>
           {q.options.map((o) => (
             <button key={o} role="radio" aria-checked={value === o} className={`btn option ${value === o ? 'selected' : ''}`} onClick={() => setValue(o)}>

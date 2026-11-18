@@ -33,6 +33,11 @@ export function diagnose(q, response) {
     const hit = Object.entries(q.traps).find(([, v]) => v === q.claimed)
     return response.choice === 'yes' && hit ? hit[0] : 'unknown'
   }
+  if (q.format === 'findstep') {
+    if (response.value === q.answer) return 'correct'
+    // Saying "No mistake" to a misconception step means she accepts that move
+    return response.value === 'No mistake' && q.errorType ? q.errorType : 'unknown'
+  }
   if (q.format === 'blank') {
     const verb = normVerb(response.verb)
     if (verb === q.blank.verb && parseNum(response.num) === q.blank.num) return 'correct'

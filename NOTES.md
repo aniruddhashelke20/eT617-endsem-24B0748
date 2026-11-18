@@ -21,6 +21,7 @@ Riya Pawar, 14, Class 8, repeating linear equations after failing (8/25). **M1**
 | 7 | Diagnostic: 3 warm-ups + confidence → start level & focus | Profile adaptivity; affect-aware start |
 | 8 | Refresher (opposite operations) + Summary in words not % | Prerequisite sequencing (Gagné); growth framing for L5 |
 | 10 | Fill-in-the-blanks ("To undo division by 4, we ____ both sides by __") with a free-text operation word (synonyms accepted) + number | Recall of the inverse-operation rule in words (generation effect); blank answers are diagnosed (wrong inverse → M1/M2) |
+| 11 | Find the mistake: worked 2-step solution, choose Step 1 / Step 2 / No mistake (mistake is M1 in step 1, M2 in step 2, or none) | Error analysis of worked examples (Große & Renkl): learners judge each step against the balance rule; "No mistake" on a faulty step reveals the misconception |
 | 9 | Teacher view: progress, approve/override feedback, override level/focus, log | C5 human-in-the-loop; teacher as orchestrator |
 
 ## File map
@@ -41,6 +42,7 @@ Riya Pawar, 14, Class 8, repeating linear equations after failing (8/25). **M1**
 - 19:01 – from my testing: (1) the teacher's note shown to the learner now repeats the question, her Yes/No and her reason, so the review isn't out of context; (2) conclusion-only reasons ("doesn't satisfy the equation") are recognised — credited if true, then the substitution is shown.
 - 19:14 – a strong reason now just gets "✓ Good reasoning!" (no checklist). Added the fill-in-the-blanks format at Levels 1–2, including x ÷ a = c items with their own alternative explanation.
 - 19:19 – answering "No" and giving the correct x ("x should be 4", "x = 4", or just "4") now counts as a valid reason. If that number also appears in the equation (4x = 16 → x = 4), the checker needs "x = 4" / "it's 4" or an operation word, so a copied coefficient is not credited.
+- 19:20 – added the find-the-mistake format (Levels 2–3). About ⅓ of items have no mistake, so the learner has to check each step instead of assuming one is wrong.
 - Learner and teacher share one device's localStorage (no backend); in a real school this would sync to a server. Demo PIN 617 shown on purpose.
 
 ## AI-usage note

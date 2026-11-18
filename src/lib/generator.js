@@ -84,6 +84,32 @@ function twoStep(level) {
 
 const MAKERS = { oneAdd, oneMul, twoStep }
 
+// Find the mistake: a worked solution of ax + b = c in 2 numbered steps.
+// Either no mistake, an M1 mistake in step 1 (sign not changed), or an M2 mistake in step 2 (subtracts a).
+function makeFindStep(q, focus) {
+  const { a, b, c } = q
+  const undoWord = b > 0 ? `Subtract ${b} from both sides` : `Add ${-b} to both sides`
+  const rhs1 = c - b // correct value of a·x
+  const rhsM1 = c + b // sign not changed
+  const step1 = `${undoWord} → ${term(a)} = ${show(c)} ${b > 0 ? '−' : '+'} ${Math.abs(b)} = ${show(rhs1)}`
+  const step1M1 = `Move ${b > 0 ? '+ ' + b : '− ' + -b} to the other side → ${term(a)} = ${show(c)} ${b > 0 ? '+' : '−'} ${Math.abs(b)} = ${show(rhsM1)}`
+  const step2 = (r) => `Divide both sides by ${a} → x = ${show(r)} ÷ ${a} = ${show(r / a)}`
+  const step2M2 = (r) => `Remove the ${a} → x = ${show(r)} − ${a} = ${show(r - a)}`
+
+  const canM1 = Number.isInteger(rhsM1 / a) && rhsM1 / a !== q.x
+  let kind = focus === 'M1' && canM1 ? 'M1' : focus === 'M2' ? 'M2' : pick(canM1 ? ['none', 'M1', 'M2'] : ['none', 'M2'])
+  if (kind === 'M1') q.solSteps = [step1M1, step2(rhsM1)]
+  else if (kind === 'M2') q.solSteps = [step1, step2M2(rhs1)]
+  else q.solSteps = [step1, step2(rhs1)]
+  q.errorType = kind === 'none' ? null : kind
+  q.errorStep = kind === 'M1' ? 1 : kind === 'M2' ? 2 : 0
+  q.fix = kind === 'M1' ? `Step 1 is wrong. ${step1}, then ${step2(rhs1).charAt(0).toLowerCase() + step2(rhs1).slice(1)}.` : kind === 'M2' ? `Step 2 is wrong. ${step2(rhs1)}.` : `No mistake: both steps keep the balance.`
+  q.text = `${pick(NAMES)} solved this. In which step is the mistake?`
+  q.options = ['Step 1', 'Step 2', 'No mistake']
+  q.trueValue = q.x
+  q.answer = q.errorStep ? `Step ${q.errorStep}` : 'No mistake'
+}
+
 // Fill in the blanks: "To undo division by 4, we ____ both sides by __."
 // parts: strings, with null where a blank goes (1st blank = operation, 2nd = number)
 function makeBlank(q) {
@@ -132,13 +158,18 @@ export function generateQuestion(level, focus = null) {
   q.level = level
   const formats =
     level === 1 ? ['numeric', 'step', 'mcq', 'blank'] :
-    level === 2 ? ['numeric', 'mcq', 'step', 'blank'] :
-    ['spot', 'check', 'numeric']
+    level === 2 ? ['numeric', 'mcq', 'step', 'blank', 'findstep'] :
+    ['spot', 'check', 'numeric', 'findstep']
   q.format = pick(formats)
   if (q.format === 'mcq' || q.format === 'numeric') q.text = 'Solve for x:'
 
   if (q.format === 'mcq') q.options = mcqOptions(q)
   if (q.format === 'blank') makeBlank(q)
+  if (q.format === 'findstep') {
+    // needs a two-step equation; keep id/level/format
+    if (q.skill !== 'twoStep') q = { ...twoStep(level), id: q.id, level, format: 'findstep' }
+    makeFindStep(q, focus)
+  }
 
   if (q.format === 'step') {
     q.text = 'What should we do to BOTH sides first?'

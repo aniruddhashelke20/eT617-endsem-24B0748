@@ -39,7 +39,7 @@ Class 8 learners often fail linear equations because they solve with half-rememb
 3. *Undo times by dividing:* 3x = 12 means 3 groups of x; divide BOTH sides by 3 → x = 4 (subtracting gives 9, but 3 × 9 = 27).
 4. *Two steps:* 2x + 3 = 11 → subtract 3 → 2x = 8 → divide by 2 → x = 4. Always check: 2 × 4 + 3 = 11 ✓.
 
-**Tasks (6 formats; questions are generated, these are fixed examples with model answers)**
+**Tasks (7 formats; questions are generated, these are fixed examples with model answers)**
 | # | Format | Task | Model answer | Misconception answer |
 |---|---|---|---|---|
 | 1 | Multiple choice | Solve x + 4 = 9 (5 / 13 / 4) | x = 5 | 13 → M1 |
@@ -49,10 +49,11 @@ Class 8 learners often fail linear equations because they solve with half-rememb
 | 5 | Check a solution + explain | Is x = 9 a solution of 3x = 12? | No: 3 × 9 = 27 ≠ 12, so it doesn't balance; x = 4 | "Yes" → M2 |
 | 6 | Spot the error + explain | Aarav solved x + 5 = 12 and got x = 17. Is he right? | No: 17 + 5 = 22 ≠ 12; subtract 5 from both sides → x = 7 | "Yes" → M1 |
 | 7 | Fill in the blanks | To undo division by 4, we ____ both sides by __. | multiply, 4 | "divide" / "subtract" → M2 |
+| 8 | Find the mistake | Sana solved 3x + 5 = 32. Step 1: Subtract 5 from both sides → 3x = 27. Step 2: Remove the 3 → x = 27 − 3 = 24. Which step is wrong? (Step 1 / Step 2 / No mistake) | Step 2 (divide by 3 → x = 9) | "No mistake" → M2 (accepts the wrong move) |
 
-| Fill-in-the-blanks question | Feedback (wrong inverse → M2) |
-|---|---|
-| ![](docs/screens/c01-blank-question.png) | ![](docs/screens/c01-blank-feedback.png) |
+| Fill in the blanks | Its feedback | Find the mistake | Its feedback |
+|---|---|---|---|
+| ![](docs/screens/c01-blank-question.png) | ![](docs/screens/c01-blank-feedback.png) | ![](docs/screens/d02-findstep-question.png) | ![](docs/screens/d02-findstep-feedback.png) |
 
 **Feedback (actual text from the app)**
 - **Correct:** "✓ Correct! x + 8 = 15 → Subtract 8 from both sides → x = 7. Check: 7 + 8 = 15 ✓"
@@ -68,7 +69,7 @@ Class 8 learners often fail linear equations because they solve with half-rememb
 Welcome ──► Diagnostic (3 warm-ups + "how do you feel?") ──► Learn (4 steps)
    ▲                                                            │
    │ "Continue where I stopped"                                 ▼
-Summary ◄── Feedback ◄──────────────► Practice (6 formats, hint)
+Summary ◄── Feedback ◄──────────────► Practice (7 formats, hint)
               │  correct ×2 → harder level
               │  known misconception → alternative explanation → similar item
               └─ unknown / repeated misconception → Refresher → easier level

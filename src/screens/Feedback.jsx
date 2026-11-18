@@ -15,17 +15,18 @@ export default function Feedback({ state, go, update }) {
   // The wrong value, put back into the equation → tilted balance (learner sees WHY it is wrong)
   const yesNo = q.format === 'check' || q.format === 'spot'
   const weakReason = expl && expl.quality !== 'strong'
-  const wrongVal = yesNo ? q.claimed : q.format === 'step' || q.format === 'blank' ? null : parseNum(response.value)
+  const wrongVal = yesNo ? q.claimed : q.format === 'step' || q.format === 'blank' || q.format === 'findstep' ? null : parseNum(response.value)
   const showTilt = !ok && wrongVal !== null && wrongVal !== (q.trueValue ?? q.answer)
   const { left, right } = sides(q.expr)
   const filled = left.replace(/(\d*)x/, (_, a) => (a ? `${a} × (${show(wrongVal)})` : `(${show(wrongVal)})`))
-  const yours = yesNo ? response.choice : q.format === 'step' || q.format === 'blank' ? response.value : `x = ${wrongVal === null ? response.value : show(wrongVal)}`
+  const yours = yesNo ? response.choice : q.format === 'step' || q.format === 'blank' || q.format === 'findstep' ? response.value : `x = ${wrongVal === null ? response.value : show(wrongVal)}`
 
   return (
     <section className="card">
       <div className={`box ${ok ? 'ok' : 'warn'}`} role="status">
         <strong>{ok && weakReason ? '✓ Right answer — now let us make your reason complete.' : ok ? '✓ Correct!' : '↻ Not yet — let us look again.'}</strong>
         {q.format === 'blank' && <p><strong>{q.blankAnswer}</strong></p>}
+        {q.format === 'findstep' && <p><strong>{q.fix}</strong></p>}
         <p>{ok ? solutionText(q) : <>You answered <strong>{yours}</strong>.</>}</p>
       </div>
 

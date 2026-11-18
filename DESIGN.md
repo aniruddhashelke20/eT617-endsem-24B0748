@@ -36,11 +36,12 @@ Many Class 8 learners fail linear equations because they solve by half-remembere
 ## D3 · Content plan
 **Concept explanation (Learn, 4 short steps with a balance picture):** equation = balance → undo + with − on both sides → undo × with ÷ on both sides → two steps (remove the number first, then divide) and always check by substituting.
 
-**Question formats (6):**
+**Question formats (7):**
 1. **Numeric** – Solve for x: 3x + 4 = 19
 2. **Multiple choice** with diagnostic distractors (each wrong option = M1/M2/M3 answer)
 3. **Choose the first step** – "What should we do to BOTH sides first?" (Subtract 4 / Add 4 / Subtract 3)
 4. **Check a solution** – "Is x = 9 a solution of 3x = 12? Put it back in and explain." (yes/no + one line)
+7. **Find the mistake** – a worked 2-step solution; which step is wrong (Step 1 / Step 2 / No mistake)?
 6. **Fill in the blanks** – "To undo division by 4, we ____ both sides by __."
 5. **Spot the error** – "Aarav solved x + 5 = 12 and got x = 17. Is he right? Explain."
 
