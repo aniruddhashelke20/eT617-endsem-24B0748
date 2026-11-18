@@ -47,8 +47,12 @@ Class 8 learners often fail linear equations because they solve with half-rememb
 | 3 | Numeric | Solve 3x + 4 = 19 | x = 5 (subtract 4 → 3x = 15 → ÷3) | 23/3 is not an integer → no M1 trap; 12 → M2 |
 | 4 | Choose the first step | x + 6 = 10: what do we do to BOTH sides first? | Subtract 6 from both sides | "Add 6 to both sides" → M1 |
 | 5 | Check a solution + explain | Is x = 9 a solution of 3x = 12? | No: 3 × 9 = 27 ≠ 12, so it doesn't balance; x = 4 | "Yes" → M2 |
-| 7 | Fill in the blanks | To undo division by 4, we ____ both sides by __. | multiply, 4 | "divide" / "subtract" → M2 |
 | 6 | Spot the error + explain | Aarav solved x + 5 = 12 and got x = 17. Is he right? | No: 17 + 5 = 22 ≠ 12; subtract 5 from both sides → x = 7 | "Yes" → M1 |
+| 7 | Fill in the blanks | To undo division by 4, we ____ both sides by __. | multiply, 4 | "divide" / "subtract" → M2 |
+
+| Fill-in-the-blanks question | Feedback (wrong inverse → M2) |
+|---|---|
+| ![](docs/screens/c01-blank-question.png) | ![](docs/screens/c01-blank-feedback.png) |
 
 **Feedback (actual text from the app)**
 - **Correct:** "✓ Correct! x + 8 = 15 → Subtract 8 from both sides → x = 7. Check: 7 + 8 = 15 ✓"
