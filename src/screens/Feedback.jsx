@@ -18,7 +18,7 @@ export default function Feedback({ state, go, update }) {
   const showTilt = !ok && wrongVal !== null && wrongVal !== (q.trueValue ?? q.answer)
   const { left, right } = sides(q.expr)
   const filled = left.replace(/(\d*)x/, (_, a) => (a ? `${a} × (${show(wrongVal)})` : `(${show(wrongVal)})`))
-  const yours = yesNo ? response.choice : q.format === 'step' ? response.value : `x = ${response.value}`
+  const yours = yesNo ? response.choice : q.format === 'step' ? response.value : `x = ${wrongVal === null ? response.value : show(wrongVal)}`
 
   return (
     <section className="card">
