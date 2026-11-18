@@ -42,6 +42,7 @@ function QuestionCard({ q, state, update }) {
       response: yesNo ? `${choice}${text ? ` — “${text}”` : ''}` : String(value),
       correct: yesNo ? `${q.answer} (x = ${show(q.trueValue)})` : q.format === 'step' ? q.stepAnswer : `x = ${show(q.answer)}`,
       verdict, move, hints, seconds: Math.round((Date.now() - startedAt) / 1000),
+      choice, reason: text, // kept separately so a teacher note can be shown with its context
       auto: expl, // automated feedback on the explanation
       review: expl ? { status: 'pending', text: expl.feedback } : null,
     }
@@ -74,8 +75,10 @@ function QuestionCard({ q, state, update }) {
 
       {teacherNotes.map((e) => (
         <div key={e.id} className="box info" role="status">
-          <strong>📝 Your teacher reviewed your explanation</strong>
-          <p>{e.review.text}</p>
+          <strong>📝 Your teacher reviewed one of your answers</strong>
+          <p><strong>Question:</strong> {e.question}</p>
+          <p><strong>You answered:</strong> {e.choice === 'yes' ? 'Yes' : 'No'} · <strong>Your reason:</strong> “{e.reason || '—'}”</p>
+          <p><strong>Teacher:</strong> {e.review.text}</p>
           <button className="btn" onClick={() => update({ log: state.log.map((x) => (x.id === e.id ? { ...x, review: { ...x.review, seen: true } } : x)) })}>Got it</button>
         </div>
       ))}

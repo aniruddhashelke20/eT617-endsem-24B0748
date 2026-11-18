@@ -98,14 +98,21 @@ export function checkExplanation(q, text = '', choice = null) {
   const lhsRight = has(lhs)
   const compared = has(q.c) || /balanc|equal|same|≠|!=|not|n't/.test(t)
   const solved = has(q.trueValue) && /subtract|minus|add|plus|divid|multipl|both sides|opposite/.test(t)
-  const saysNo = /not|n't|≠|!=|wrong|unequal|\bno\b/.test(t)
-  const saysYes = /balanc|equal|same|correct|right|\byes\b/.test(t) && !saysNo
+  // conclusion words, incl. "satisfies / doesn't satisfy the equation"
+  const saysNo = /not|n't|nt\b|≠|!=|wrong|unequal|false|invalid|\bno\b/.test(t)
+  const saysYes = /satisf|works|holds|true|valid|balanc|equal|same|correct|right|\byes\b/.test(t) && !saysNo
   const disagrees = (choice === 'no' && saysYes) || (choice === 'yes' && saysNo)
 
   const points = []
+  // A conclusion without working: credit the idea, then show the working
+  if (!usedClaim && !solved && (saysYes || saysNo) && !disagrees) {
+    const claimTrue = saysNo === (q.claimed !== q.trueValue)
+    const said = `You said x = ${show(q.claimed)} ${saysNo ? 'does not satisfy' : 'satisfies'} the equation`
+    points.push(claimTrue ? `✓ ${said} — right idea. Now show it:` : `↻ ${said} — let us test that:`)
+  }
   if (solved) points.push(`✓ You solved it yourself and got x = ${show(q.trueValue)} — that is a good reason.`)
   if (usedClaim) points.push(`✓ You put x = ${show(q.claimed)} back in.`)
-  else if (!solved) points.push(`↻ Put x = ${show(q.claimed)} back into the equation.`)
+  else if (!solved) points.push(`↻ Put x = ${show(q.claimed)} back in: ${leftWithX} = ${show(lhs)}.`)
   if (usedClaim && lhsRight) points.push(`✓ Left side: ${leftWithX} = ${show(lhs)}.`)
   else if (usedClaim) points.push(`↻ Check the left side: ${leftWithX} = ${show(lhs)}.`)
   if (compared && (usedClaim || solved)) points.push(`✓ You compared it with the right side (${show(q.c)}).`)
