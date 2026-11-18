@@ -39,7 +39,7 @@ Class 8 learners often fail linear equations because they solve with half-rememb
 3. *Undo times by dividing:* 3x = 12 means 3 groups of x; divide BOTH sides by 3 → x = 4 (subtracting gives 9, but 3 × 9 = 27).
 4. *Two steps:* 2x + 3 = 11 → subtract 3 → 2x = 8 → divide by 2 → x = 4. Always check: 2 × 4 + 3 = 11 ✓.
 
-**Tasks (5 formats; questions are generated, these are fixed examples with model answers)**
+**Tasks (6 formats; questions are generated, these are fixed examples with model answers)**
 | # | Format | Task | Model answer | Misconception answer |
 |---|---|---|---|---|
 | 1 | Multiple choice | Solve x + 4 = 9 (5 / 13 / 4) | x = 5 | 13 → M1 |
@@ -47,6 +47,7 @@ Class 8 learners often fail linear equations because they solve with half-rememb
 | 3 | Numeric | Solve 3x + 4 = 19 | x = 5 (subtract 4 → 3x = 15 → ÷3) | 23/3 is not an integer → no M1 trap; 12 → M2 |
 | 4 | Choose the first step | x + 6 = 10: what do we do to BOTH sides first? | Subtract 6 from both sides | "Add 6 to both sides" → M1 |
 | 5 | Check a solution + explain | Is x = 9 a solution of 3x = 12? | No: 3 × 9 = 27 ≠ 12, so it doesn't balance; x = 4 | "Yes" → M2 |
+| 7 | Fill in the blanks | To undo division by 4, we ____ both sides by __. | multiply, 4 | "divide" / "subtract" → M2 |
 | 6 | Spot the error + explain | Aarav solved x + 5 = 12 and got x = 17. Is he right? | No: 17 + 5 = 22 ≠ 12; subtract 5 from both sides → x = 7 | "Yes" → M1 |
 
 **Feedback (actual text from the app)**
@@ -63,7 +64,7 @@ Class 8 learners often fail linear equations because they solve with half-rememb
 Welcome ──► Diagnostic (3 warm-ups + "how do you feel?") ──► Learn (4 steps)
    ▲                                                            │
    │ "Continue where I stopped"                                 ▼
-Summary ◄── Feedback ◄──────────────► Practice (5 formats, hint)
+Summary ◄── Feedback ◄──────────────► Practice (6 formats, hint)
               │  correct ×2 → harder level
               │  known misconception → alternative explanation → similar item
               └─ unknown / repeated misconception → Refresher → easier level
@@ -120,7 +121,7 @@ Each move is shown to the learner with its reason ("Why this next step?"). All t
 - *What it does:* reads the learner's one-line reason on check / spot-the-error tasks and gives point-by-point feedback built from what she actually wrote.
 - *Input (actual example):* 3x = 12, claimed x = 9, choice "no", text "3*9=21 not 12".
 - *Rules:* pulls the numbers out of the text, then checks the steps of a substitution check: (1) did she put the claimed x back in, (2) is her left-side value correct (a × claimed + b), (3) did she compare with the right side, (4) does the reason agree with her Yes/No. Solving the equation herself (correct x + an operation word) also counts.
-- *Output (actual):* `quality: 'partial'` with "✓ You put x = 9 back in. ↻ Check the left side: 3 × 9 = 27. ✓ You compared it with the right side (12)." It is `strong` only if all steps are right (or she solved it correctly) and the reason agrees with her answer.
+- *Output (actual):* `quality: 'partial'` with "✓ You put x = 9 back in. ↻ Check the left side: 3 × 9 = 27. ✓ You compared it with the right side (12)." It is `strong` only if all steps are right (or she solved it correctly) and the reason agrees with her answer; then the learner simply sees "✓ Good reasoning!". A conclusion-only reason ("it doesn't satisfy the equation") is credited if true and followed by the working.
 - *Check before the learner sees it:* her own text is shown above the feedback ("You wrote: …"), labelled "Checking your reason · your teacher will also see this". Every item goes to the teacher's **review queue** (pending → approved / overridden). A correct Yes/No with an unclear reason is shown as "Right answer — now let us make your reason complete" and does not count towards levelling up.
 - *Fallback when wrong:* the teacher overrides it in their own words, and the learner sees the teacher's note on her next question.
 

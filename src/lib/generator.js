@@ -83,6 +83,34 @@ function twoStep(level) {
 }
 
 const MAKERS = { oneAdd, oneMul, twoStep }
+
+// Fill in the blanks: "To undo division by 4, we ____ both sides by __."
+// parts: strings, with null where a blank goes (1st blank = operation, 2nd = number)
+function makeBlank(q) {
+  q.text = 'Fill in the blanks:'
+  if (q.skill === 'oneMul' && Math.random() < 0.5) {
+    // division variant: x ÷ a = c
+    const a = q.a, c = q.x, x = a * c
+    Object.assign(q, {
+      expr: `x ÷ ${a} = ${show(c)}`, x, answer: x, traps: {},
+      steps: [`x ÷ ${a} = ${show(c)}`, opText('×', a), `x = ${show(x)}`],
+      check: `${show(x)} ÷ ${a} = ${show(c)} ✓`,
+    })
+    q.parts = [`To undo division by ${a}, we `, null, ' both sides by ', null, '.']
+    q.blank = { verb: 'multiply', num: a, verbTraps: { divide: 'M2', subtract: 'M2', add: 'M2' } }
+  } else if (q.skill === 'oneMul') {
+    q.parts = [`To undo multiplying by ${q.a}, we `, null, ' both sides by ', null, '.']
+    q.blank = { verb: 'divide', num: q.a, verbTraps: { subtract: 'M2', multiply: 'M2' } }
+  } else {
+    const first = q.skill === 'twoStep' ? 'First, t' : 'T'
+    const b = q.b
+    q.parts = [`${first}o undo "${b > 0 ? '+ ' + b : '− ' + -b}", we `, null, ' ', null, ' on both sides.']
+    q.blank = b > 0
+      ? { verb: 'subtract', num: b, verbTraps: { add: 'M1' } }
+      : { verb: 'add', num: -b, verbTraps: { subtract: 'M1' } }
+  }
+  q.blankAnswer = q.parts.map((p, i) => (p === null ? (i === 1 ? q.blank.verb : q.blank.num) : p)).join('')
+}
 const NAMES = ['Aarav', 'Sana', 'Kabir', 'Meera', 'Rohan']
 
 function mcqOptions(q) {
@@ -103,13 +131,14 @@ export function generateQuestion(level, focus = null) {
   q.id = `q${Date.now()}-${counter++}`
   q.level = level
   const formats =
-    level === 1 ? ['numeric', 'step', 'mcq'] :
-    level === 2 ? ['numeric', 'mcq', 'step'] :
+    level === 1 ? ['numeric', 'step', 'mcq', 'blank'] :
+    level === 2 ? ['numeric', 'mcq', 'step', 'blank'] :
     ['spot', 'check', 'numeric']
   q.format = pick(formats)
   if (q.format === 'mcq' || q.format === 'numeric') q.text = 'Solve for x:'
 
   if (q.format === 'mcq') q.options = mcqOptions(q)
+  if (q.format === 'blank') makeBlank(q)
 
   if (q.format === 'step') {
     q.text = 'What should we do to BOTH sides first?'

@@ -18,6 +18,8 @@ export default function Practice(props) {
 
 function QuestionCard({ q, state, update }) {
   const [value, setValue] = useState('')
+  const [verb, setVerb] = useState('')
+  const [num, setNum] = useState('')
   const [choice, setChoice] = useState(null)
   const [text, setText] = useState('')
   const [hints, setHints] = useState(0)
@@ -27,10 +29,10 @@ function QuestionCard({ q, state, update }) {
   const yesNo = q.format === 'spot' || q.format === 'check'
 
   const teacherNotes = state.log.filter((e) => e.review?.status === 'overridden' && !e.review.seen)
-  const ready = yesNo ? choice !== null : value !== ''
+  const ready = yesNo ? choice !== null : q.format === 'blank' ? verb.trim() !== '' && num.trim() !== '' : value !== ''
 
   function submit() {
-    const response = yesNo ? { choice, text } : { value }
+    const response = yesNo ? { choice, text } : q.format === 'blank' ? { verb, num, value: `${verb} ${num}` } : { value }
     const verdict = diagnose(q, response)
     const expl = q.needsExplanation ? checkExplanation(q, text, choice) : null
     const explained = !expl || expl.quality !== 'unclear'
@@ -39,8 +41,8 @@ function QuestionCard({ q, state, update }) {
     const entry = {
       id: q.id, time: new Date().toISOString(), level: q.level, skill: q.skill, format: q.format,
       question: yesNo ? q.text : `${q.text} ${q.expr}`,
-      response: yesNo ? `${choice}${text ? ` — “${text}”` : ''}` : String(value),
-      correct: yesNo ? `${q.answer} (x = ${show(q.trueValue)})` : q.format === 'step' ? q.stepAnswer : `x = ${show(q.answer)}`,
+      response: yesNo ? `${choice}${text ? ` — “${text}”` : ''}` : String(response.value),
+      correct: yesNo ? `${q.answer} (x = ${show(q.trueValue)})` : q.format === 'step' ? q.stepAnswer : q.format === 'blank' ? `${q.blank.verb} ${q.blank.num}` : `x = ${show(q.answer)}`,
       verdict, move, hints, seconds: Math.round((Date.now() - startedAt) / 1000),
       choice, reason: text, // kept separately so a teacher note can be shown with its context
       auto: expl, // automated feedback on the explanation
@@ -97,6 +99,17 @@ function QuestionCard({ q, state, update }) {
             <button type="button" className="btn" onClick={() => setValue((v) => (v.startsWith('-') ? v.slice(1) : '-' + v))}>± make negative</button>
           </span>
         </label>
+      )}
+
+      {q.format === 'blank' && (
+        <p className="blanks">
+          {q.parts.map((p, i) =>
+            p !== null ? <span key={i}>{p}</span>
+            : i === 1 ? <input key={i} className="blank wide" aria-label="Blank 1: operation (add, subtract, multiply, divide)" value={verb} onChange={(e) => setVerb(e.target.value)} placeholder="operation" list="verbs" />
+            : <input key={i} className="blank" inputMode="numeric" aria-label="Blank 2: number" value={num} onChange={(e) => setNum(e.target.value)} placeholder="no." />
+          )}
+          <datalist id="verbs"><option value="add" /><option value="subtract" /><option value="multiply" /><option value="divide" /></datalist>
+        </p>
       )}
 
       {(q.format === 'mcq' || q.format === 'step') && (

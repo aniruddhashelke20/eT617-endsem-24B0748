@@ -4,11 +4,21 @@ import { show } from './generator.js'
 
 export const MISCONCEPTIONS = {
   M1: 'Moves a number across "=" without changing its sign (x + 5 = 12 → x = 17)',
-  M2: 'Undoes "times" by subtracting (3x = 12 → x = 9)',
+  M2: 'Undoes "times" or "divide" with the wrong operation (3x = 12 → x = 9)',
   M3: 'Divides only some terms (2x + 4 = 10 → x + 4 = 5)',
 }
 
 // Accept "-8", "−8", "x = 8", " 8 "
+// "divided", "Divide", "share" -> 'divide' etc.
+export function normVerb(v = '') {
+  const t = String(v).toLowerCase()
+  if (/divid|share/.test(t)) return 'divide'
+  if (/multipl|times/.test(t)) return 'multiply'
+  if (/subtract|minus|take|remov|less/.test(t)) return 'subtract'
+  if (/add|plus|sum/.test(t)) return 'add'
+  return t.trim()
+}
+
 export function parseNum(v) {
   const s = String(v ?? '').trim().replace(/[−–]/g, '-').replace(/^x\s*=\s*/i, '')
   const n = Number(s)
@@ -22,6 +32,12 @@ export function diagnose(q, response) {
     // Accepting a misconception's answer reveals that misconception
     const hit = Object.entries(q.traps).find(([, v]) => v === q.claimed)
     return response.choice === 'yes' && hit ? hit[0] : 'unknown'
+  }
+  if (q.format === 'blank') {
+    const verb = normVerb(response.verb)
+    if (verb === q.blank.verb && parseNum(response.num) === q.blank.num) return 'correct'
+    if (verb !== q.blank.verb) return q.blank.verbTraps[verb] ?? 'unknown'
+    return 'unknown' // right operation, wrong number
   }
   if (q.format === 'step') {
     if (response.value === q.stepAnswer) return 'correct'
@@ -56,6 +72,15 @@ export function alternativeFor(m, q) {
       body: [
         `An equation is a balance. Whatever we do to one side, we do to the other.`,
         `To remove "${bTxt}", we ${undo} (the opposite) on BOTH sides. "Change side, change sign" is a short way of saying this.`,
+        solutionText(q),
+      ],
+    }
+  if (m === 'M2' && q.expr.includes('÷'))
+    return {
+      title: `÷ ${q.a} is undone by × ${q.a}`,
+      body: [
+        `${q.expr} means: x was shared into ${q.a} equal groups, and each group is ${show(q.x / q.a)}.`,
+        `To get the whole x back, put the ${q.a} groups together: multiply both sides by ${q.a}.`,
         solutionText(q),
       ],
     }
@@ -121,8 +146,9 @@ export function checkExplanation(q, text = '', choice = null) {
 
   const good = !disagrees && (solved || (usedClaim && lhsRight && compared))
   const some = points.some((p) => p.startsWith('✓'))
+  if (good) return { quality: 'strong', points, feedback: '✓ Good reasoning!' }
   return {
-    quality: good ? 'strong' : some ? 'partial' : 'unclear',
+    quality: some ? 'partial' : 'unclear',
     points,
     feedback: points.join('\n'),
   }

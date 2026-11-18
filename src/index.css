@@ -79,3 +79,6 @@ th, td { border-bottom: 1px solid var(--line); padding: 6px; text-align: left; v
 h1:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 .pre { white-space: pre-line; }
+.blanks { font-size: 1.15rem; line-height: 2.4; }
+.blank { width: 70px; min-height: 44px; font: inherit; font-weight: 700; text-align: center; border: 0; border-bottom: 3px solid var(--primary); background: var(--info-bg); border-radius: 6px 6px 0 0; margin: 0 4px; }
+.blank.wide { width: 130px; }
