@@ -16,6 +16,8 @@ Riya Pawar, 13, Class 7, Pune municipal school, repeating integers after failing
 | 3 | Decision rule: harder / alternative explanation / prerequisite | Adaptive tutoring, ZPD (Vygotsky), mastery learning (Bloom): 2-in-a-row to level up |
 | 4 | Number line (display + tap input + ◀ ▶) | Concrete→representational (Bruner); dual coding (words + picture); topic-specific tool (rubric T6) |
 | 5 | Learn screen (4 short steps) | Cognitive load (one idea per screen), signalling with highlights, conversational style (Mayer) |
+| 7 | Diagnostic: 3 warm-ups + confidence → start level & first focus | Profile adaptivity (rubric P13); affect-aware start for anxious learner |
+| 8 | Prerequisite refresher (opposites) + Summary in words, not % | Prerequisite sequencing (Gagné); attribution / growth framing for L5 |
 | 6 | Practice + Feedback (5 formats, hint without penalty, "Why this next step?") | Formative feedback (Hattie), refutation text for M1/M2, transparency of adaptivity |
 
 ## File map

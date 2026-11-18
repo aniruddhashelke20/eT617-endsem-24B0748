@@ -5,6 +5,9 @@ import About from './screens/About.jsx'
 import Learn from './screens/Learn.jsx'
 import Practice from './screens/Practice.jsx'
 import Feedback from './screens/Feedback.jsx'
+import Diagnostic from './screens/Diagnostic.jsx'
+import Prereq from './screens/Prereq.jsx'
+import Summary from './screens/Summary.jsx'
 
 import { ROLL } from './lib/config.js'
 
@@ -28,6 +31,9 @@ export default function App() {
     learn: <Learn {...props} />,
     practice: <Practice {...props} />,
     feedback: <Feedback {...props} />,
+    diagnostic: <Diagnostic {...props} />,
+    prereq: <Prereq {...props} />,
+    summary: <Summary {...props} />,
   }
 
   return (
