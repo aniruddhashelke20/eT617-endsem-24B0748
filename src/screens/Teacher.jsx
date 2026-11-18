@@ -44,7 +44,7 @@ function Dashboard({ state, update, go }) {
         <dl className="facts">
           <dt>Warm-up</dt>
           <dd>{d ? `${d.score}/3 · feels ${d.confidence} · started Level ${d.startLevel}` : 'not done'}</dd>
-          <dt>Now</dt><dd>Level {state.level} · {state.streak}/{LEVEL_UP} in a row{state.retrySkill ? ` · retrying ${CONCEPT[state.retrySkill]}` : ''}</dd>
+          <dt>Now</dt><dd>Level {state.level} · {state.streak}/{LEVEL_UP} in a row{state.pending ? ` · halfway through a pair (${CONCEPT[state.pending.q.skill]})` : ''}</dd>
           <dt>Attempts</dt><dd>{log.length} ({right} correct)</dd>
           <dt>Hints used</dt><dd>{hinted} questions · avg {avg}s per question</dd>
         </dl>
@@ -69,12 +69,12 @@ function Dashboard({ state, update, go }) {
         <h2>Override the tutor's next step</h2>
         <div className="row">
           <label className="field">Level
-            <select value={state.level} onChange={(e) => update({ level: Number(e.target.value), streak: 0, current: null })}>
+            <select value={state.level} onChange={(e) => update({ level: Number(e.target.value), streak: 0, current: null, pending: null })}>
               {[1, 2, 3].map((l) => <option key={l} value={l}>Level {l}</option>)}
             </select>
           </label>
           <label className="field">Focus
-            <select value={state.focus ?? ''} onChange={(e) => update({ focus: e.target.value || null, current: null })}>
+            <select value={state.focus ?? ''} onChange={(e) => update({ focus: e.target.value || null, current: null, pending: null })}>
               <option value="">Mixed (tutor decides)</option>
               {Object.keys(MISCONCEPTIONS).map((m) => <option key={m} value={m}>{m}</option>)}
             </select>

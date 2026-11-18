@@ -12,9 +12,7 @@ export const initialState = {
   focus: null, // misconception to target next
   altShownFor: null, // misconception that already got an alternative explanation
   hintsInRow: 0,
-  pair: null, // { skill, first } after the 1st question of a same-concept pair
-  note: null, // neutral note shown on the next question
-  retrySkill: null, // concept to ask again
+  pending: null, // 1st answered question of the current same-concept pair (no feedback shown yet)
   diagnostic: null, // { score, confidence, startLevel }
   counts: { M1: 0, M2: 0, M3: 0 },
   log: [], // every attempt, used by the teacher view

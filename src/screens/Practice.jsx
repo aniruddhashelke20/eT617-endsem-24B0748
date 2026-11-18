@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Balance, { sides } from '../components/Balance.jsx'
 import { generateQuestion, show } from '../lib/generator.js'
 import { diagnose, checkExplanation } from '../lib/diagnose.js'
-import { decide, CONCEPT, MOVE_NOTE } from '../lib/tutor.js'
+import { decidePair, CONCEPT } from '../lib/tutor.js'
 
 const LEVEL_NAME = { 1: 'Level 1 · one-step', 2: 'Level 2 · two-step', 3: 'Level 3 · check & spot the error' }
 
@@ -10,7 +10,7 @@ export default function Practice(props) {
   const { state, update } = props
   // Generate a question if none is waiting (also on resume)
   useEffect(() => {
-    if (!state.current) update({ current: generateQuestion(state.level, state.focus, state.retrySkill) })
+    if (!state.current) update({ current: generateQuestion(state.level, state.focus) })
   }, [state.current]) // eslint-disable-line
   if (!state.current) return null
   return <QuestionCard key={state.current.id} q={state.current} {...props} />
@@ -36,33 +36,37 @@ function QuestionCard({ q, state, update }) {
     const verdict = diagnose(q, response)
     const expl = q.needsExplanation ? checkExplanation(q, text, choice) : null
     const explained = !expl || expl.quality !== 'unclear'
-    const { move, patch } = decide(state, verdict, explained, q.skill)
 
     const entry = {
       id: q.id, time: new Date().toISOString(), level: q.level, skill: q.skill, format: q.format,
       question: yesNo ? q.text : `${q.text} ${q.expr}`,
       response: yesNo ? `${choice}${text ? ` — “${text}”` : ''}` : String(response.value),
       correct: yesNo ? `${q.answer} (x = ${show(q.trueValue)})` : q.format === 'step' ? q.stepAnswer : q.format === 'findstep' ? q.answer : q.format === 'blank' ? `${q.blank.verb} ${q.blank.num}` : `x = ${show(q.answer)}`,
-      verdict, move, hints, seconds: Math.round((Date.now() - startedAt) / 1000),
+      verdict, hints, seconds: Math.round((Date.now() - startedAt) / 1000),
       choice, reason: text, // kept separately so a teacher note can be shown with its context
       auto: expl, // automated feedback on the explanation
       review: expl ? { status: 'pending', text: expl.feedback } : null,
     }
+    const item = { q, response, verdict, expl, explained }
     const counts = { ...state.counts }
     if (counts[verdict] !== undefined) counts[verdict]++
+    const common = { counts, hintsInRow: hints > 0 ? state.hintsInRow + 1 : 0, log: [...state.log, entry] }
 
-    // No right/wrong after each answer: stay on practice with a neutral note,
-    // and only open the Feedback screen when a concept is being taught (2 wrong in a pair).
-    const teach = move === 'alternative' || move === 'prerequisite'
+    // Question 1 of the pair: save the answer, show NO right/wrong, go to question 2 (same concept)
+    if (!state.pending) {
+      update({ ...common, pending: item, current: generateQuestion(state.level, state.focus, q.skill) })
+      return
+    }
+
+    // Question 2: decide on both answers together, then show the results screen
+    const items = [state.pending, item]
+    const { move, misconception, patch } = decidePair(state, items.map((i) => i.verdict), items.map((i) => i.explained))
+    const moveEntries = common.log.map((e) => (e.id === q.id || e.id === state.pending.q.id ? { ...e, move } : e))
     update({
-      ...patch,
-      counts,
-      hintsInRow: hints > 0 ? state.hintsInRow + 1 : 0,
-      log: [...state.log, entry],
-      feedback: teach ? { q, verdict, move, response, expl } : null,
-      note: MOVE_NOTE[move] ?? null,
-      current: null,
-      screen: teach ? 'feedback' : move === 'mastered' ? 'summary' : 'practice',
+      ...patch, ...common, log: moveEntries,
+      pending: null, current: null,
+      feedback: { items, move, misconception },
+      screen: 'feedback',
     })
   }
 
@@ -75,11 +79,8 @@ function QuestionCard({ q, state, update }) {
   return (
     <section className="card">
       <p className="muted">
-        {LEVEL_NAME[q.level]} · <span className="badge">{CONCEPT[q.skill]}</span>
-        {state.retrySkill && <> · <span className="badge">one more of the same kind</span></>}
+        Question {state.pending ? 2 : 1} of 2 · <span className="badge">{CONCEPT[q.skill]}</span> · {LEVEL_NAME[q.level]}
       </p>
-
-      {state.note && <p className="box info" role="status">{state.note}</p>}
 
       {teacherNotes.map((e) => (
         <div key={e.id} className="box info" role="status">
@@ -159,7 +160,7 @@ function QuestionCard({ q, state, update }) {
 
       <div className="row">
         <button className="btn" onClick={() => setHints(hints + 1)} disabled={hints >= 1}>💡 Hint (no penalty)</button>
-        <button className="btn primary" disabled={!ready} onClick={submit}>Check</button>
+        <button className="btn primary" disabled={!ready} onClick={submit}>{state.pending ? 'See my results' : 'Next question →'}</button>
       </div>
     </section>
   )

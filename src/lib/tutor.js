@@ -1,12 +1,11 @@
 // THE ADAPTIVE DECISION RULE (P4 design challenge) — viva version
-// Questions come in PAIRS of the same CONCEPT (skill): undoing + / −, undoing × / ÷, two-step equations.
-// No right/wrong is shown after each answer; answers are just saved.
-//  after the 1st question of a pair            -> ask a 2nd question of the SAME concept
-//  after the 2nd: both wrong                   -> TEACH that concept
-//        known misconception, not yet explained -> ALTERNATIVE explanation of that misconception
-//        unrecognised, or already explained     -> PREREQUISITE lesson, easier level
-//  after the 2nd: at least one right           -> no teaching, new question
-//  LEVEL_UP correct answers in a row           -> HARDER level
+// Questions come in PAIRS on the same CONCEPT (skill): undoing + / −, undoing × / ÷, two-step equations.
+// Both questions are answered on one screen and submitted together.
+//  both wrong   -> TEACH that concept:
+//                    known misconception, not yet explained -> ALTERNATIVE explanation of that misconception
+//                    unrecognised, or already explained     -> PREREQUISITE lesson, easier level
+//  1 or 0 wrong -> just show the results, no lesson
+//  LEVEL_UP correct answers in a row (counted across pairs) -> HARDER level
 export const LEVEL_UP = 6
 
 export const CONCEPT = {
@@ -15,47 +14,42 @@ export const CONCEPT = {
   twoStep: 'Two-step equations',
 }
 
-export function decide(state, verdict, explained = true, skill = null) {
-  const right = verdict === 'correct' && explained
-  let streak = right ? state.streak + 1 : 0
+// verdicts: ['correct' | 'M1' | 'M2' | 'M3' | 'unknown', …] for the 2 questions
+// explained: [true/false, …] — a right Yes/No with no real reason does not count as right
+export function decidePair(state, verdicts, explained) {
+  let streak = state.streak
   let level = state.level
   let levelled = false
-  if (streak >= LEVEL_UP) {
-    streak = 0
-    if (level < 3) { level += 1; levelled = true } else return { move: 'mastered', patch: { streak, pair: null, retrySkill: null } }
+  verdicts.forEach((v, i) => {
+    streak = v === 'correct' && explained[i] ? streak + 1 : 0
+    if (streak >= LEVEL_UP) {
+      streak = 0
+      if (level < 3) { level += 1; levelled = true }
+    }
+  })
+  const bothWrong = verdicts.every((v) => v !== 'correct')
+
+  if (!bothWrong) {
+    const mastered = state.level === 3 && verdicts.every((v) => v === 'correct') && state.streak + 2 >= LEVEL_UP
+    return { move: mastered ? 'mastered' : levelled ? 'harder' : 'results', patch: { streak, level, focus: null } }
   }
-  const base = { streak, level }
 
-  // 1st question of a pair: save it and ask another of the same concept
-  if (!state.pair) {
-    return { move: levelled ? 'harder' : 'pairNext', patch: { ...base, pair: { skill, first: verdict }, retrySkill: skill } }
-  }
-
-  // 2nd question of the pair
-  const clear = { ...base, pair: null, retrySkill: null }
-  const bothWrong = state.pair.first !== 'correct' && verdict !== 'correct'
-  if (!bothWrong) return { move: levelled ? 'harder' : 'next', patch: { ...clear, focus: null } }
-
-  const prev = state.pair.first
-  const m = verdict !== 'unknown' ? verdict : prev !== 'unknown' ? prev : 'unknown'
+  // Both wrong: teach. Prefer a recognised misconception from either answer (latest first).
+  const m = [...verdicts].reverse().find((v) => v !== 'unknown') ?? 'unknown'
   if (m !== 'unknown' && state.altShownFor !== m) {
-    return { move: 'alternative', patch: { ...clear, streak: 0, focus: m, altShownFor: m } }
+    return { move: 'alternative', misconception: m, patch: { streak: 0, focus: m, altShownFor: m } }
   }
   return {
     move: 'prerequisite',
-    patch: { ...clear, streak: 0, level: Math.max(1, state.level - 1), altShownFor: null, focus: m === 'unknown' ? null : m },
+    misconception: m,
+    patch: { streak: 0, level: Math.max(1, state.level - 1), altShownFor: null, focus: m === 'unknown' ? null : m },
   }
 }
 
-// Short neutral notes shown on the next question (no right/wrong)
-export const MOVE_NOTE = {
-  pairNext: 'Answer saved. Here is one more on the same idea.',
-  next: 'Answer saved. On to a new question.',
-  harder: `Level up! ${LEVEL_UP} in a row — the questions get a bit harder now.`,
-}
-
 export const MOVE_REASON = {
+  results: 'At least one answer was right, so we keep going. A new pair is next.',
+  harder: `Level up! ${LEVEL_UP} right in a row — the next questions are a bit harder.`,
+  mastered: 'You cleared the top level!',
   alternative: 'Both answers on this idea matched a common mix-up, so here is another way to see it.',
   prerequisite: 'Both answers on this idea were not right yet, so let us warm up one basic idea first.',
-  mastered: 'You cleared the top level!',
 }
