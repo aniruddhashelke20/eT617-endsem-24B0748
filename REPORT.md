@@ -57,7 +57,7 @@ Class 8 learners often fail linear equations because they solve with half-rememb
 
 **Feedback (actual text from the app)**
 - **Correct:** "✓ Correct! x + 8 = 15 → Subtract 8 from both sides → x = 7. Check: 7 + 8 = 15 ✓"
-- **M1 (answered 23 for x + 8 = 15):** "↻ Not yet — let us look again." "💪 This is one of the most common mix-ups in Class 8. Spotting it is how we fix it." " Let's put x = 23 back in: 23 + 8 = 31, not 15." The balance is drawn tilted. Then: "💡 Keep the balance: do the OPPOSITE to both sides. An equation is a balance. Whatever we do to one side, we do to the other. To remove '+ 8', we subtract 8 (the opposite) on BOTH sides. 'Change side, change sign' is a short way of saying this."
+- **M1 (answered 23 for x + 8 = 15):** "↻ Not yet — let us look again." "💪 This is one of the most common mix-ups in Class 8. Spotting it is how we fix it." "Let's put x = 23 back in: 23 + 8 = 31, not 15." The balance is drawn tilted. Then: "💡 Keep the balance: do the OPPOSITE to both sides. An equation is a balance. Whatever we do to one side, we do to the other. To remove '+ 8', we subtract 8 (the opposite) on BOTH sides. 'Change side, change sign' is a short way of saying this."
 - **M2 (answered 9 for 3x = 12):** "Let's put x = 9 back in: 3 × 9 = 27, not 12." Tilted balance. "💡 3x means 3 TIMES x — undo times with divide. 3x means 3 equal groups of x. To find one group, we share (divide) by 3 on both sides. Subtracting 3 only takes away 3; it does not split into 3 groups."
 - **M3:** "💡 Divide EVERY term — or remove the number first. 2x + 4 = 10 → x + 2 = 5 (not x + 4 = 5). Easier way: first subtract 4 from both sides, then divide."
 
