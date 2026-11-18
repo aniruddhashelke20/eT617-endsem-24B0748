@@ -74,3 +74,7 @@ table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
 th, td { border-bottom: 1px solid var(--line); padding: 6px; text-align: left; vertical-align: top; }
 .balance { margin: 12px 0; }
 .balance svg { width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto; }
+.skip { position: absolute; left: -999px; }
+.skip:focus { left: 8px; top: 8px; background: #fff; padding: 8px; z-index: 10; }
+h1:focus { outline: none; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

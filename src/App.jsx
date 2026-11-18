@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { loadState, saveState, clearState, initialState } from './lib/storage.js'
 import Welcome from './screens/Welcome.jsx'
 import About from './screens/About.jsx'
@@ -17,6 +17,14 @@ import { ROLL } from './lib/config.js'
 export default function App() {
   const [state, setState] = useState(loadState)
   useEffect(() => saveState(state), [state])
+
+  // Accessibility: on every screen change, move keyboard/screen-reader focus to the new heading
+  const mainRef = useRef(null)
+  useEffect(() => {
+    const h = mainRef.current?.querySelector('h1')
+    if (h) { h.setAttribute('tabindex', '-1'); h.focus() }
+    window.scrollTo(0, 0)
+  }, [state.screen, state.current?.id])
 
   const update = (patch) => setState((s) => ({ ...s, ...patch }))
   const go = (screen) => update({ screen })
@@ -40,6 +48,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <a className="skip" href="#main">Skip to content</a>
       <header className="topbar">
         <button className="brand" onClick={() => go('welcome')} aria-label="Home">
           <span aria-hidden="true">⚖️</span> Balance Buddy
@@ -49,7 +58,7 @@ export default function App() {
           <button className="link" onClick={() => go('about')}>About</button>
         </nav>
       </header>
-      <main id="main">{screens[state.screen] ?? screens.welcome}</main>
+      <main id="main" ref={mainRef}>{screens[state.screen] ?? screens.welcome}</main>
       <footer className="footer">
         ET 617 End-Sem · <strong>{ROLL}</strong> · P4 Adaptive tutor · Linear equations (Cl. 8)
       </footer>
