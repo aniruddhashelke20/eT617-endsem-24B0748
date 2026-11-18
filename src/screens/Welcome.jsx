@@ -22,7 +22,7 @@ export default function Welcome({ state, update, go, reset }) {
 
       {started ? (
         <>
-          <button className="btn primary" onClick={() => go(state.current ? 'practice' : 'learn')}>
+          <button className="btn primary" onClick={() => go(state.diagnostic ? 'practice' : 'diagnostic')}>
             Continue where I stopped
           </button>
           <button className="btn" onClick={reset}>Start over</button>
