@@ -1,131 +1,133 @@
-// Automatic question generation: templates × learner state.
-// Each question carries its correct answer AND the answer each misconception would produce
-// ("traps"), so a wrong answer can be diagnosed, not just marked wrong.
+// Automatic question generation for linear equations in one variable (Class 8).
+// Templates × learner state (level, focus misconception). Each question stores its answer AND
+// "traps": the answer each misconception would produce, so wrong answers can be diagnosed.
 
 const rnd = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1))
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
 export const show = (n) => (n < 0 ? `−${-n}` : `${n}`) // proper minus sign
-const par = (n) => (n < 0 ? `(−${-n})` : `${n}`) // brackets around negatives
+const term = (a) => (a === 1 ? 'x' : `${a}x`)
+const plus = (b) => (b >= 0 ? `+ ${b}` : `− ${-b}`)
+const isInt = (n) => Number.isInteger(n)
 
-// Skill ↔ misconception it targets
-export const SKILL_FOR = { M1: 'addNeg', M2: 'subNeg', M3: 'compare' }
+// Which skill practises which misconception
+export const SKILL_FOR = { M1: 'oneAdd', M2: 'oneMul', M3: 'twoStep' }
 
-// Number size grows with level (difficulty)
-const range = (level) => (level === 1 ? [1, 5] : level === 2 ? [2, 9] : [3, 12])
+// Words for "do this to both sides"
+export const opText = (op, n) =>
+  ({ '+': `Add ${n} to both sides`, '−': `Subtract ${n} from both sides`, '÷': `Divide both sides by ${n}`, '×': `Multiply both sides by ${n}` })[op]
 
-function addNeg(level) {
-  const [lo, hi] = range(level)
-  const a = rnd(lo, hi), b = rnd(lo, hi)
+function cleanTraps(traps, answer) {
+  const out = {}
+  for (const [m, v] of Object.entries(traps)) if (isInt(v) && v !== answer) out[m] = v
+  return out
+}
+
+// x + b = c  or  x − b = c
+function oneAdd(level) {
+  const x = level === 3 ? pick([rnd(1, 12), -rnd(1, 9)]) : rnd(1, 9)
+  const b = rnd(2, 9) * (Math.random() < 0.5 ? 1 : -1)
+  const c = x + b
+  const undo = b > 0 ? ['−', b] : ['+', -b]
+  const wrong = b > 0 ? ['+', b] : ['−', -b]
   return {
-    skill: 'addNeg', a: -a, b: -b, op: '+',
-    expr: `${par(-a)} + ${par(-b)}`,
-    answer: -(a + b),
-    traps: { M1: a + b }, // "two minuses make a plus"
+    skill: 'oneAdd', a: 1, b, c, x,
+    expr: `x ${plus(b)} = ${show(c)}`,
+    answer: x,
+    traps: cleanTraps({ M1: c + b }, x), // moved b across without changing its sign
+    stepAnswer: opText(...undo),
+    stepTraps: { [opText(...wrong)]: 'M1' },
+    steps: [`x ${plus(b)} = ${show(c)}`, opText(...undo), `x = ${show(x)}`],
+    check: `${show(x)} ${plus(b)} = ${show(c)} ✓`,
   }
 }
 
-function subNeg(level) {
-  const [lo, hi] = range(level)
-  const x = level === 1 ? rnd(lo, hi) : pick([rnd(lo, hi), -rnd(lo, hi)])
-  const b = rnd(lo, hi)
+// a·x = c
+function oneMul(level) {
+  const a = rnd(2, level === 1 ? 6 : 9)
+  const x = level === 3 ? pick([rnd(2, 9), -rnd(2, 9)]) : rnd(2, 9)
+  const c = a * x
   return {
-    skill: 'subNeg', a: x, b: -b, op: '−',
-    expr: `${par(x)} − ${par(-b)}`,
-    answer: x + b,
-    traps: { M2: x - b }, // ignores the sign of the number being subtracted
+    skill: 'oneMul', a, b: 0, c, x,
+    expr: `${term(a)} = ${show(c)}`,
+    answer: x,
+    traps: cleanTraps({ M2: c - a }, x), // "undoes" 3x by subtracting 3
+    stepAnswer: opText('÷', a),
+    stepTraps: { [opText('−', a)]: 'M2', [opText('×', a)]: 'M2' },
+    steps: [`${term(a)} = ${show(c)}`, opText('÷', a), `x = ${show(x)}`],
+    check: `${a} × ${show(x)} = ${show(c)} ✓`,
   }
 }
 
-function addMixed(level) {
-  const [lo, hi] = range(level)
-  const a = rnd(lo, hi)
-  let b = rnd(lo, hi + 1)
-  while (b === a) b = rnd(lo, hi + 1)
-  const negFirst = Math.random() < 0.5
-  const [p, q] = negFirst ? [-a, b] : [a, -b]
+// a·x + b = c
+function twoStep(level) {
+  const a = rnd(2, level === 3 ? 9 : 5)
+  const x = level === 3 ? pick([rnd(1, 9), -rnd(1, 6)]) : rnd(1, 9)
+  const b = rnd(1, 9) * (Math.random() < 0.6 ? 1 : -1)
+  const c = a * x + b
+  const undo = b > 0 ? ['−', b] : ['+', -b]
+  const wrong = b > 0 ? ['+', b] : ['−', -b]
   return {
-    skill: 'addMixed', a: p, b: q, op: '+',
-    expr: `${par(p)} + ${par(q)}`,
-    answer: p + q,
-    traps: { M1: Math.abs(p) + Math.abs(q) }, // adds sizes and makes it positive
+    skill: 'twoStep', a, b, c, x,
+    expr: `${term(a)} ${plus(b)} = ${show(c)}`,
+    answer: x,
+    traps: cleanTraps({
+      M1: (c + b) / a, // moved b without changing sign
+      M3: c / a - b, // divided only some terms by a
+      M2: c - b - a, // subtracted a instead of dividing
+    }, x),
+    stepAnswer: opText(...undo),
+    stepTraps: { [opText(...wrong)]: 'M1', [opText('−', a)]: 'M2' },
+    steps: [`${term(a)} ${plus(b)} = ${show(c)}`, opText(...undo), `${term(a)} = ${show(a * x)}`, opText('÷', a), `x = ${show(x)}`],
+    check: `${a} × ${show(x)} ${plus(b)} = ${show(c)} ✓`,
   }
 }
 
-function compare(level) {
-  const [lo, hi] = range(level)
-  let a = rnd(lo, hi), b = rnd(lo, hi)
-  while (a === b) b = rnd(lo, hi)
-  const big = -Math.min(a, b) // e.g. −2 is greater than −7
-  const small = -Math.max(a, b)
-  return {
-    skill: 'compare', format: 'mcq',
-    text: `Which number is greater?`,
-    expr: `${show(-a)}  or  ${show(-b)}`,
-    answer: big,
-    options: [-a, -b],
-    traps: { M3: small }, // picks the bigger digit
-  }
-}
-
-const MAKERS = { addNeg, subNeg, addMixed, compare }
+const MAKERS = { oneAdd, oneMul, twoStep }
+const NAMES = ['Aarav', 'Sana', 'Kabir', 'Meera', 'Rohan']
 
 function mcqOptions(q) {
   const opts = new Set([q.answer, ...Object.values(q.traps)])
-  opts.add(-q.answer)
-  while (opts.size < 4) opts.add(q.answer + pick([-2, -1, 1, 2, 3]))
-  return [...opts].sort(() => Math.random() - 0.5)
+  while (opts.size < 4) opts.add(q.answer + pick([-3, -2, -1, 1, 2, 3]))
+  return [...opts].slice(0, 4).sort(() => Math.random() - 0.5)
 }
 
-const NAMES = ['Aarav', 'Sana', 'Kabir', 'Meera', 'Rohan']
-
 let counter = 0
-// focus = misconception to target (after an alternative explanation) or null
+// focus = misconception to target next (after an alternative explanation) or null
 export function generateQuestion(level, focus = null) {
-  const skills = level === 1 ? ['addNeg', 'subNeg'] : ['addNeg', 'subNeg', 'addMixed', 'compare']
+  const skills = level === 1 ? ['oneAdd', 'oneMul'] : ['oneAdd', 'oneMul', 'twoStep', 'twoStep']
   const skill = focus ? SKILL_FOR[focus] : pick(skills)
-  const q = MAKERS[skill](level)
+  let q = MAKERS[skill](level)
+  // make sure a focus question can actually show its misconception
+  for (let i = 0; focus && !q.traps[focus] && i < 10; i++) q = MAKERS[skill](level)
+
   q.id = `q${Date.now()}-${counter++}`
   q.level = level
+  const formats =
+    level === 1 ? ['numeric', 'step', 'mcq'] :
+    level === 2 ? ['numeric', 'mcq', 'step'] :
+    ['spot', 'check', 'numeric']
+  q.format = pick(formats)
+  if (q.format === 'mcq' || q.format === 'numeric') q.text = 'Solve for x:'
 
-  if (!q.format) {
-    const formats =
-      level === 1 ? ['numeric', 'numberline'] :
-      level === 2 ? ['numeric', 'mcq', 'numberline'] :
-      ['spot', 'predict', 'numeric']
-    q.format = pick(formats)
+  if (q.format === 'mcq') q.options = mcqOptions(q)
+
+  if (q.format === 'step') {
+    q.text = 'What should we do to BOTH sides first?'
+    q.options = [q.stepAnswer, ...Object.keys(q.stepTraps)].sort(() => Math.random() - 0.5)
   }
 
-  // keep number-line taps readable on a 360 px phone: only −10..10
-  if (q.format === 'numberline' && (Math.abs(q.answer) > 10 || Math.abs(q.a) > 10)) q.format = 'numeric'
-
-  if (q.format === 'mcq' && !q.options) q.options = mcqOptions(q)
-
-  if (q.format === 'numeric') q.text = `Work out:`
-  if (q.format === 'mcq' && q.skill !== 'compare') q.text = `Choose the answer:`
-  if (q.format === 'numberline') q.text = `Tap where you land on the number line:`
-
-  if (q.format === 'spot') {
-    // Show a classmate's answer — usually the misconception answer, sometimes the right one
-    const trap = Object.values(q.traps)[0]
-    const claimed = Math.random() < 0.7 ? trap : q.answer
+  if (q.format === 'spot' || q.format === 'check') {
+    // A claimed solution: usually a misconception answer, sometimes the right one
+    const trapVals = Object.values(q.traps)
+    const claimed = trapVals.length && Math.random() < 0.7 ? pick(trapVals) : q.answer
     q.claimed = claimed
     q.who = pick(NAMES)
-    q.text = `${q.who} says ${q.expr} = ${show(claimed)}. Is ${q.who} right? Explain in one line.`
-    q.answer = claimed === q.answer ? 'yes' : 'no'
-    q.trueValue = eval0(q)
-    q.needsExplanation = true
-  }
-
-  if (q.format === 'predict') {
+    q.text = q.format === 'spot'
+      ? `${q.who} solved ${q.expr} and got x = ${show(claimed)}. Is ${q.who} right? Explain in one line.`
+      : `Is x = ${show(claimed)} a solution of ${q.expr}? Put it back in and explain.`
     q.trueValue = q.answer
-    q.text = `Without working it out fully: will the answer be positive or negative? Say why.`
-    q.answer = q.trueValue > 0 ? 'positive' : q.trueValue < 0 ? 'negative' : 'zero'
+    q.answer = claimed === q.trueValue ? 'yes' : 'no'
     q.needsExplanation = true
   }
   return q
-}
-
-// true numeric value for spot questions (a op b)
-function eval0(q) {
-  return q.op === '+' ? q.a + q.b : q.a - q.b
 }

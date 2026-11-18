@@ -9,8 +9,8 @@ export default function Welcome({ state, update, go, reset }) {
     <section className="card">
       <h1>Hi{state.name ? `, ${state.name}` : ''}! 👋</h1>
       <p>
-        Let's practise <strong>adding and subtracting negative numbers</strong> together, using a
-        number line. No timer. Mistakes are fine here — they show us what to practise next.
+        Let's practise <strong>solving equations like 2x + 3 = 11</strong> together, using a
+        balance.  No timer. Mistakes are fine here — they show us what to practise next.
       </p>
 
       {!started && (

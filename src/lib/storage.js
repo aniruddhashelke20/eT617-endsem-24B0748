@@ -1,10 +1,10 @@
 // All learner + teacher data lives in one localStorage object (no backend).
-const KEY = 'nlb-v1'
+const KEY = 'balance-buddy-v1'
 
 export const initialState = {
   screen: 'welcome',
   name: '',
-  level: 1, // 1 = small numbers, 2 = bigger/mixed, 3 = spot-the-error + predict
+  level: 1, // 1 = one-step, 2 = two-step, 3 = check / spot-the-error
   streak: 0, // correct answers in a row at this level
   current: null, // the question on screen
   feedback: null, // last feedback shown

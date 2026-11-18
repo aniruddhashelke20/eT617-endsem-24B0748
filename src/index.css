@@ -72,3 +72,5 @@ mark { background: #ffe68a; padding: 0 3px; border-radius: 3px; }
 .table-wrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
 th, td { border-bottom: 1px solid var(--line); padding: 6px; text-align: left; vertical-align: top; }
+.balance { margin: 12px 0; }
+.balance svg { width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto; }

@@ -42,7 +42,7 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <button className="brand" onClick={() => go('welcome')} aria-label="Home">
-          <span aria-hidden="true">➖➕</span> Number Line Buddy
+          <span aria-hidden="true">⚖️</span> Balance Buddy
         </button>
         <nav aria-label="Main">
           <button className="link" onClick={() => go('teacher')}>Teacher</button>
@@ -51,7 +51,7 @@ export default function App() {
       </header>
       <main id="main">{screens[state.screen] ?? screens.welcome}</main>
       <footer className="footer">
-        ET 617 End-Sem · <strong>{ROLL}</strong> · P4 Adaptive tutor · Integers (Cl. 7)
+        ET 617 End-Sem · <strong>{ROLL}</strong> · P4 Adaptive tutor · Linear equations (Cl. 8)
       </footer>
     </div>
   )

@@ -57,7 +57,7 @@ function Dashboard({ state, update, go }) {
 
       <section className="card">
         <h2>Review automated feedback ({queue.length} waiting)</h2>
-        {queue.length === 0 && <p className="muted">Nothing to review. Explanations appear here at Level 3 (spot-the-error, predict).</p>}
+        {queue.length === 0 && <p className="muted">Nothing to review. Explanations appear here at Level 3 (check / spot-the-error). Tip: set Level 3 below to test..</p>}
         {queue.map((e) => <ReviewItem key={e.id} e={e} onSave={setReview} />)}
         {reviewed.length > 0 && (
           <p className="muted">Reviewed: {reviewed.filter((e) => e.review.status === 'approved').length} approved, {reviewed.filter((e) => e.review.status === 'overridden').length} overridden.</p>

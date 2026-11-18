@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import NumberLine from '../components/NumberLine.jsx'
+import Balance, { sides } from '../components/Balance.jsx'
 import { generateQuestion, show } from '../lib/generator.js'
 import { diagnose, checkExplanation } from '../lib/diagnose.js'
 import { decide } from '../lib/tutor.js'
 
-const LEVEL_NAME = { 1: 'Level 1 · small numbers', 2: 'Level 2 · bigger & mixed', 3: 'Level 3 · spot the error & predict' }
+const LEVEL_NAME = { 1: 'Level 1 · one-step', 2: 'Level 2 · two-step', 3: 'Level 3 · check & spot the error' }
 
 export default function Practice(props) {
   const { state, update } = props
@@ -17,21 +17,20 @@ export default function Practice(props) {
 }
 
 function QuestionCard({ q, state, update }) {
-  const [value, setValue] = useState(q.format === 'numberline' ? null : '')
+  const [value, setValue] = useState('')
   const [choice, setChoice] = useState(null)
   const [text, setText] = useState('')
   const [hints, setHints] = useState(0)
   const [startedAt] = useState(Date.now())
-  // Interaction adaptivity: 2 questions in a row with hints -> number line shown by default
-  const lineByDefault = state.hintsInRow >= 2
+  // Interaction adaptivity: hints on 2 questions in a row -> balance helper shown by default
+  const helperByDefault = state.hintsInRow >= 2
+  const yesNo = q.format === 'spot' || q.format === 'check'
 
   const teacherNotes = state.log.filter((e) => e.review?.status === 'overridden' && !e.review.seen)
-
-  const ready =
-    q.format === 'spot' || q.format === 'predict' ? choice !== null : value !== null && value !== ''
+  const ready = yesNo ? choice !== null : value !== ''
 
   function submit() {
-    const response = q.format === 'spot' || q.format === 'predict' ? { choice, text } : { value }
+    const response = yesNo ? { choice, text } : { value }
     const verdict = diagnose(q, response)
     const expl = q.needsExplanation ? checkExplanation(q, text) : null
     const explained = !expl || expl.quality !== 'unclear'
@@ -39,9 +38,9 @@ function QuestionCard({ q, state, update }) {
 
     const entry = {
       id: q.id, time: new Date().toISOString(), level: q.level, skill: q.skill, format: q.format,
-      question: `${q.text} ${q.format === 'spot' ? '' : q.expr}`.trim(),
-      response: response.choice ? `${response.choice}${text ? ` — “${text}”` : ''}` : String(response.value),
-      correct: q.trueValue !== undefined ? `${q.answer} (value ${show(q.trueValue)})` : String(q.answer),
+      question: yesNo ? q.text : `${q.text} ${q.expr}`,
+      response: yesNo ? `${choice}${text ? ` — “${text}”` : ''}` : String(value),
+      correct: yesNo ? `${q.answer} (x = ${show(q.trueValue)})` : q.format === 'step' ? q.stepAnswer : `x = ${show(q.answer)}`,
       verdict, move, hints, seconds: Math.round((Date.now() - startedAt) / 1000),
       auto: expl, // automated feedback on the explanation
       review: expl ? { status: 'pending', text: expl.feedback } : null,
@@ -54,16 +53,17 @@ function QuestionCard({ q, state, update }) {
       counts,
       hintsInRow: hints > 0 ? state.hintsInRow + 1 : 0,
       log: [...state.log, entry],
-      feedback: { q, verdict, move, response, expl, entryId: q.id },
+      feedback: { q, verdict, move, response, expl },
       current: null,
       screen: 'feedback',
     })
   }
 
   const hintText =
-    q.skill === 'compare'
-      ? 'Find both numbers on the line. Which one is further RIGHT?'
-      : `Start at ${show(q.a)}. Does ${q.op} ${show(q.b)} move you left or right?`
+    q.skill === 'oneMul' ? `${q.a}x means ${q.a} times x. What undoes "times"?`
+    : q.skill === 'oneAdd' ? `What is added to or taken from x? Do the opposite to both sides.`
+    : `First remove the number (${q.b > 0 ? '+ ' + q.b : '− ' + -q.b}), then deal with ${q.a}x.`
+  const { left, right } = sides(q.expr)
 
   return (
     <section className="card">
@@ -82,54 +82,50 @@ function QuestionCard({ q, state, update }) {
 
       <h1 className="question">
         {q.text}
-        {q.format !== 'spot' && <span className="expr">{q.expr}</span>}
+        {!yesNo && <span className="expr">{q.expr}</span>}
       </h1>
 
       {q.format === 'numeric' && (
         <label className="field">
-          Your answer
-          <input inputMode="text" value={value} onChange={(e) => setValue(e.target.value)} placeholder="e.g. −4"
+          Your answer: x =
+          <input inputMode="text" value={value} onChange={(e) => setValue(e.target.value)} placeholder="e.g. 4 or −3"
             onKeyDown={(e) => e.key === 'Enter' && ready && submit()} />
           <span className="row signs">
-            <button type="button" className="btn" onClick={() => setValue((v) => (v.startsWith('-') ? v.slice(1) : '-' + v))}>± sign</button>
+            <button type="button" className="btn" onClick={() => setValue((v) => (v.startsWith('-') ? v.slice(1) : '-' + v))}>± make negative</button>
           </span>
         </label>
       )}
 
-      {q.format === 'mcq' && (
-        <div role="radiogroup" aria-label="Options" className="options">
+      {(q.format === 'mcq' || q.format === 'step') && (
+        <div role="radiogroup" aria-label="Options" className={q.format === 'mcq' ? 'options' : ''}>
           {q.options.map((o) => (
             <button key={o} role="radio" aria-checked={value === o} className={`btn option ${value === o ? 'selected' : ''}`} onClick={() => setValue(o)}>
-              {value === o ? '● ' : '○ '}{show(o)}
+              {value === o ? '● ' : '○ '}{q.format === 'mcq' ? `x = ${show(o)}` : o}
             </button>
           ))}
         </div>
       )}
 
-      {q.format === 'numberline' && (
-        <NumberLine min={-10} max={10} start={q.a} value={value} onPick={setValue} label={`Tap where ${q.expr} lands`} />
-      )}
-
-      {(q.format === 'spot' || q.format === 'predict') && (
+      {yesNo && (
         <>
           <div role="radiogroup" aria-label="Your choice" className="row">
-            {(q.format === 'spot' ? ['yes', 'no'] : ['positive', 'negative']).map((c) => (
+            {['yes', 'no'].map((c) => (
               <button key={c} role="radio" aria-checked={choice === c} className={`btn option ${choice === c ? 'selected' : ''}`} onClick={() => setChoice(c)}>
-                {choice === c ? '● ' : '○ '}{c === 'yes' ? 'Yes, right' : c === 'no' ? 'No, wrong' : c}
+                {choice === c ? '● ' : '○ '}{c === 'yes' ? 'Yes' : 'No'}
               </button>
             ))}
           </div>
           <label className="field">
             Why? (one line)
-            <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Start at …, move … steps left/right" />
+            <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder={`Put x = ${show(q.claimed)} back in: …`} />
           </label>
         </>
       )}
 
-      {(hints > 0 || lineByDefault) && (
+      {(hints > 0 || helperByDefault) && (
         <div className="box info" aria-live="polite">
           {hints > 0 && <p><strong>Hint:</strong> {hintText}</p>}
-          {q.format !== 'numberline' && <NumberLine min={-12} max={12} start={q.skill === 'compare' ? null : q.a} label="Number line helper" />}
+          <Balance left={left} right={right} />
         </div>
       )}
 

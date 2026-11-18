@@ -7,7 +7,7 @@ export default function About({ go }) {
       <dl className="facts">
         <dt>Roll no.</dt><dd><strong>{ROLL}</strong></dd>
         <dt>Problem</dt><dd>P4 – Adaptive tutor with automatic question generation</dd>
-        <dt>Topic</dt><dd>P4-T1 – Integers: operations with negative numbers (Class 7)</dd>
+        <dt>Topic</dt><dd>P4-T3 – Linear equations in one variable (Class 8)</dd>
         <dt>Learner</dt><dd>L5 – Repeating the topic after failing once; anxious</dd>
         <dt>Constraint</dt><dd>C5 – Teacher-in-the-loop</dd>
       </dl>

@@ -1,24 +1,38 @@
-import NumberLine, { hopsFor } from '../components/NumberLine.jsx'
+import Balance, { sides } from '../components/Balance.jsx'
 import { show } from '../lib/generator.js'
-import { walkText, alternativeFor } from '../lib/diagnose.js'
+import { solutionText, alternativeFor, backCheck, parseNum } from '../lib/diagnose.js'
 import { MOVE_REASON } from '../lib/tutor.js'
 
 // Shows the result and the tutor's next move (harder / alternative / prerequisite).
-// Language for an anxious learner: "Not yet", never a red cross; always icon + words, not colour alone.
+// Anxious learner: "Not yet", never a red cross; icon + words, never colour alone.
 export default function Feedback({ state, go, update }) {
   const f = state.feedback
   if (!f) return <button className="btn primary" onClick={() => go('practice')}>Continue</button>
   const { q, verdict, move, response, expl } = f
   const ok = verdict === 'correct'
   const alt = move === 'alternative' ? alternativeFor(verdict, q) : null
-  const yours = response.choice ?? (response.value === null ? '—' : show(Number(String(response.value).replace(/[−–]/g, '-'))))
+
+  // The wrong value, put back into the equation → tilted balance (learner sees WHY it is wrong)
+  const yesNo = q.format === 'check' || q.format === 'spot'
+  const wrongVal = yesNo ? q.claimed : q.format === 'step' ? null : parseNum(response.value)
+  const showTilt = !ok && wrongVal !== null && wrongVal !== (q.trueValue ?? q.answer)
+  const { left, right } = sides(q.expr)
+  const filled = left.replace(/(\d*)x/, (_, a) => (a ? `${a} × (${show(wrongVal)})` : `(${show(wrongVal)})`))
+  const yours = yesNo ? response.choice : q.format === 'step' ? response.value : `x = ${response.value}`
 
   return (
     <section className="card">
       <div className={`box ${ok ? 'ok' : 'warn'}`} role="status">
         <strong>{ok ? '✓ Correct!' : '↻ Not yet — let us look again.'}</strong>
-        <p>{ok ? walkText(q) : <>You answered <strong>{yours}</strong>. {move !== 'alternative' && walkText(q)}</>}</p>
+        <p>{ok ? solutionText(q) : <>You answered <strong>{yours}</strong>.</>}</p>
       </div>
+
+      {showTilt && (
+        <>
+          <p>Let's put x = {show(wrongVal)} back in: <strong>{backCheck(q, wrongVal)}</strong>.</p>
+          <Balance left={filled} right={right} tilt={1} label={`With x = ${wrongVal} the two sides are not equal`} />
+        </>
+      )}
 
       {expl && (
         <div className="box info">
@@ -33,10 +47,7 @@ export default function Feedback({ state, go, update }) {
           <ol className="steps">{alt.body.map((b, i) => <li key={i}>{b}</li>)}</ol>
         </>
       )}
-
-      {q.skill !== 'compare' && (
-        <NumberLine min={-15} max={15} start={q.a} hops={hopsFor(q)} label={walkText(q)} />
-      )}
+      {!ok && !alt && <p className="box info">{solutionText(q)}</p>}
 
       <p className="muted"><strong>Why this next step?</strong> {MOVE_REASON[move]}</p>
 

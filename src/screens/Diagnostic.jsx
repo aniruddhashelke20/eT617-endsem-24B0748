@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { show } from '../lib/generator.js'
 
 // Profile adaptivity: 3 fixed warm-up items + a confidence check decide the start level
-// and which misconception to focus on first. Each wrong option is a known misconception.
+// and the first misconception to focus on. Each wrong option is a known misconception.
 const ITEMS = [
-  { expr: '(−2) + (−4)', options: [-6, 6, -2], answer: -6, traps: { 6: 'M1' } },
-  { expr: '6 − (−2)', options: [4, 8, -8], answer: 8, traps: { 4: 'M2' } },
-  { expr: 'Which is greater: −3 or −8?', options: [-3, -8], answer: -3, traps: { '-8': 'M3' } },
+  { expr: 'x + 4 = 9', options: [5, 13, 4], answer: 5, traps: { 13: 'M1' } },
+  { expr: '4x = 20', options: [16, 5, 80], answer: 5, traps: { 16: 'M2', 80: 'M2' } },
+  { expr: '2x + 6 = 14', options: [1, 10, 4], answer: 4, traps: { 1: 'M3', 10: 'M1' } },
 ]
 const FEELINGS = [
   { id: 'low', label: '😟 Worried' },
@@ -19,8 +18,7 @@ export default function Diagnostic({ state, update }) {
   const [answers, setAnswers] = useState([])
 
   function answer(o) {
-    const next = [...answers, o]
-    setAnswers(next)
+    setAnswers([...answers, o])
     setI(i + 1)
   }
 
@@ -32,7 +30,7 @@ export default function Diagnostic({ state, update }) {
       diagnostic: { score, confidence, found, startLevel },
       level: startLevel,
       focus: found[0] ?? null,
-      // Low confidence or any mistake -> see the short explanation first
+      // Any mistake or low confidence -> short explanation first
       screen: score === 3 && confidence === 'high' ? 'practice' : 'learn',
     })
   }
@@ -42,10 +40,10 @@ export default function Diagnostic({ state, update }) {
     return (
       <section className="card">
         <p className="muted">Warm-up {i + 1} of 3 · not marked, just helps me choose your start</p>
-        <h1 className="question"><span className="expr">{it.expr}</span></h1>
+        <h1 className="question">Solve for x:<span className="expr">{it.expr}</span></h1>
         <div className="options">
           {it.options.map((o) => (
-            <button key={o} className="btn option" onClick={() => answer(o)}>{show(o)}</button>
+            <button key={o} className="btn option" onClick={() => answer(o)}>x = {o}</button>
           ))}
         </div>
         <button className="btn" onClick={() => answer(null)}>I'm not sure</button>
@@ -56,7 +54,7 @@ export default function Diagnostic({ state, update }) {
   return (
     <section className="card">
       <h1>Thanks{state.name ? `, ${state.name}` : ''}!</h1>
-      <p>One last thing: how do you feel about negative numbers right now?</p>
+      <p>One last thing: how do you feel about equations right now?</p>
       {FEELINGS.map((f) => (
         <button key={f.id} className="btn" onClick={() => finish(f.id)}>{f.label}</button>
       ))}
