@@ -63,6 +63,7 @@ Riya Pawar, 14, Class 8, repeating linear equations after failing (8/25). **M1**
 - 18:50 – explanation checker rewritten after my test: it used to return one of three fixed messages from keywords. Now it checks the substitution steps (claimed x used? left side computed right? compared with right side? reason agrees with Yes/No?) and builds ✓/↻ feedback from the learner's own numbers. A right Yes/No with no real reason no longer counts towards level-up.
 - 19:01 – from my testing: (1) the teacher's note shown to the learner now repeats the question, her Yes/No and her reason, so the review isn't out of context; (2) conclusion-only reasons ("doesn't satisfy the equation") are recognised — credited if true, then the substitution is shown.
 - 19:14 – a strong reason now just gets "✓ Good reasoning!" (no checklist). Added the fill-in-the-blanks format at Levels 1–2, including x ÷ a = c items with their own alternative explanation.
+- 19:19 – answering "No" and giving the correct x ("x should be 4", "x = 4", or just "4") now counts as a valid reason. If that number also appears in the equation (4x = 16 → x = 4), the checker needs "x = 4" / "it's 4" or an operation word, so a copied coefficient is not credited.
 - Learner and teacher share one device's localStorage (no backend); in a real school this would sync to a server. Demo PIN 617 shown on purpose.
 
 ## AI-usage note

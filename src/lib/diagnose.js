@@ -111,7 +111,7 @@ export function alternativeFor(m, q) {
 // Feedback is built from what they actually wrote, point by point.
 export function checkExplanation(q, text = '', choice = null) {
   const t = text.toLowerCase().replace(/[−–]/g, '-').replace(/×|\*/g, ' x ')
-  if (t.trim().length < 3)
+  if (t.trim().length === 0)
     return { quality: 'unclear', points: [], feedback: `↻ No reason yet. Try: "put x = ${show(q.claimed)} back in: … = …, so it balances / does not balance".` }
 
   const nums = (t.match(/-?\d+/g) || []).map(Number)
@@ -122,7 +122,13 @@ export function checkExplanation(q, text = '', choice = null) {
   const usedClaim = has(q.claimed) || /put .*(back|in)|substitut|plug|replace/.test(t)
   const lhsRight = has(lhs)
   const compared = has(q.c) || /balanc|equal|same|≠|!=|not|n't/.test(t)
-  const solved = has(q.trueValue) && /subtract|minus|add|plus|divid|multipl|both sides|opposite/.test(t)
+  // Giving the correct x (when the claim is wrong) is itself a valid reason: "No, x should be 4".
+  // If that number also appears in the equation (e.g. 4x = 16, x = 4), require "x = 4" / "x is 4" or an operation word.
+  const tv = q.trueValue
+  const statesX = new RegExp(`(x|answer|it'?s|it)\\s*(=|is|should be|must be|will be|comes to|equals)?\\s*${tv}(?![0-9])`).test(t)
+  const ambiguous = [q.a, q.b, q.c, q.claimed].includes(tv)
+  const solved = tv !== q.claimed && has(tv) &&
+    (statesX || !ambiguous || /subtract|minus|add|plus|divid|multipl|both sides|opposite/.test(t))
   // conclusion words, incl. "satisfies / doesn't satisfy the equation"
   const saysNo = /not|n't|nt\b|≠|!=|wrong|unequal|false|invalid|\bno\b/.test(t)
   const saysYes = /satisf|works|holds|true|valid|balanc|equal|same|correct|right|\byes\b/.test(t) && !saysNo
