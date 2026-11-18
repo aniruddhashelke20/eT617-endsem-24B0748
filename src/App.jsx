@@ -1,122 +1,44 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
+import { loadState, saveState, clearState, initialState } from './lib/storage.js'
+import Welcome from './screens/Welcome.jsx'
+import About from './screens/About.jsx'
 
-function App() {
-  const [count, setCount] = useState(0)
+import { ROLL } from './lib/config.js'
+
+// Simple screen state machine: state.screen decides what is shown.
+// Every change is saved, so the learner can close the phone and resume.
+export default function App() {
+  const [state, setState] = useState(loadState)
+  useEffect(() => saveState(state), [state])
+
+  const update = (patch) => setState((s) => ({ ...s, ...patch }))
+  const go = (screen) => update({ screen })
+  const reset = () => {
+    clearState()
+    setState(initialState)
+  }
+
+  const props = { state, update, go, reset }
+  const screens = {
+    welcome: <Welcome {...props} />,
+    about: <About {...props} />,
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+    <div className="app">
+      <header className="topbar">
+        <button className="brand" onClick={() => go('welcome')} aria-label="Home">
+          <span aria-hidden="true">➖➕</span> Number Line Buddy
         </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <nav aria-label="Main">
+          <button className="link" onClick={() => go('teacher')}>Teacher</button>
+          <button className="link" onClick={() => go('about')}>About</button>
+        </nav>
+      </header>
+      <main id="main">{screens[state.screen] ?? screens.welcome}</main>
+      <footer className="footer">
+        ET 617 End-Sem · <strong>{ROLL}</strong> · P4 Adaptive tutor · Integers (Cl. 7)
+      </footer>
+    </div>
   )
 }
-
-export default App
