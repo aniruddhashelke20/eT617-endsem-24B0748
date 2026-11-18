@@ -3,11 +3,11 @@
 **Live app:** https://et617-24b0748.vercel.app · **Repo:** https://github.com/aniruddhashelke20/et617-endsem-24B0748
 
 ## Identity card
+
 | Roll no. | P | T | L | C |
 |---|---|---|---|---|
 | **24B0748** | P4 Adaptive tutor with automatic question generation | P4-T3 Linear equations in one variable (Class 8) | L5 Learner repeating the topic after failing once; high anxiety, low self-efficacy | C5 Teacher-in-the-loop |
 
-*(Card screenshot attached separately on Moodle.)*
 
 ---
 
@@ -15,6 +15,7 @@
 Class 8 learners often fail linear equations because they solve with half-remembered moves ("take it to the other side") instead of the idea that **an equation is a balance**. Three typical errors follow: moving a number across "=" without changing its sign, "undoing" 3x by subtracting 3, and dividing only part of the equation. A learner who has failed once guesses quickly, avoids explaining, and never checks the answer by substituting it back. Ordinary worksheets give everyone the same items and mark only right or wrong, so the actual misconception is never found or repaired. Balance Buddy finds *which* wrong move the learner makes, repairs it with the balance model, adjusts the next task, and keeps the teacher in control of the automated feedback.
 
 **Learning outcomes**
+
 1. **Solve** one-step and two-step linear equations (x + b = c, ax = c, ax + b = c; integer solutions) with ≥ 80 % accuracy.
 2. **Explain** each solving step as "doing the same opposite operation to both sides of a balance".
 3. **Verify** a proposed solution by substituting it, and **judge** whether a classmate's solution is correct.
@@ -23,6 +24,7 @@ Class 8 learners often fail linear equations because they solve with half-rememb
 
 ## D2 · Learner persona
 **Riya Pawar**, 14, Class 8, Pune Municipal School (semi-English medium; Marathi at home).
+
 - **Prior knowledge of prerequisites:** integer addition and subtraction mostly secure; times tables secure; knows that "x is an unknown number"; inverse operations shaky; has never checked an answer by substituting it.
 - **History:** failed the linear-equations unit test (8/25) and is repeating the topic. Says "I'm just bad at maths."
 - **Misconception M1:** moves a number across "=" without changing its sign: x + 5 = 12 → x = 17.
@@ -34,12 +36,14 @@ Class 8 learners often fail linear equations because they solve with half-rememb
 
 ## D3 · Educational content
 **Concept explanation** (Learn screen: 4 short steps, each with a balance picture and highlighted key words)
+
 1. *An equation is a balance:* x + 5 = 12 means both sides weigh the same; find x without breaking the balance.
 2. *Undo adding by subtracting:* the opposite of +5 is −5, so subtract 5 from BOTH sides → x = 7 (not 17).
 3. *Undo times by dividing:* 3x = 12 means 3 groups of x; divide BOTH sides by 3 → x = 4 (subtracting gives 9, but 3 × 9 = 27).
 4. *Two steps:* 2x + 3 = 11 → subtract 3 → 2x = 8 → divide by 2 → x = 4. Always check: 2 × 4 + 3 = 11 ✓.
 
 **Tasks (7 formats; questions are generated, these are fixed examples with model answers)**
+
 | # | Format | Task | Model answer | Misconception answer |
 |---|---|---|---|---|
 | 1 | Multiple choice | Solve x + 4 = 9 (5 / 13 / 4) | x = 5 | 13 → M1 |
@@ -56,6 +60,7 @@ Class 8 learners often fail linear equations because they solve with half-rememb
 | ![](docs/screens/c01-blank-question.png) | ![](docs/screens/c01-blank-feedback.png) | ![](docs/screens/d02-findstep-question.png) | ![](docs/screens/d02-findstep-feedback.png) |
 
 **Feedback (actual text from the app)**
+
 - **Correct:** "✓ Correct! x + 8 = 15 → Subtract 8 from both sides → x = 7. Check: 7 + 8 = 15 ✓"
 - **M1 (answered 23 for x + 8 = 15):** "↻ Not yet — let us look again." "💪 This is one of the most common mix-ups in Class 8. Spotting it is how we fix it." "Let's put x = 23 back in: 23 + 8 = 31, not 15." The balance is drawn tilted. Then: "💡 Keep the balance: do the OPPOSITE to both sides. An equation is a balance. Whatever we do to one side, we do to the other. To remove '+ 8', we subtract 8 (the opposite) on BOTH sides. 'Change side, change sign' is a short way of saying this."
 - **M2 (answered 9 for 3x = 12):** "Let's put x = 9 back in: 3 × 9 = 27, not 12." Tilted balance. "💡 3x means 3 TIMES x — undo times with divide. 3x means 3 equal groups of x. To find one group, we share (divide) by 3 on both sides. Subtracting 3 only takes away 3; it does not split into 3 groups."
@@ -101,6 +106,7 @@ About: card + roll number          Footer on every screen: 24B0748
 Design choice: for an anxious learner, a wrong "correct answer" or confusing feedback costs more than it gains. The core is therefore a **deterministic, rule-based generator and diagnoser** that runs in the browser: answers are computed, never predicted. A **human (the teacher) checks** the only open-ended judgement, the explanations. There is no external AI service, so no API key, no network dependency and no hallucination risk. Each "AI" feature is specified below.
 
 **1. Automatic question generation** (`src/lib/generator.js`)
+
 - *What it does:* creates a new equation task matched to the learner's level and current misconception.
 - *Input (actual call):* `generateQuestion(level = 2, focus = 'M1')`
 - *Output (actual example):* `{ skill:'twoStep', expr:'3x + 4 = 19', answer:5, traps:{ M2:12 }, format:'numeric', steps:['3x + 4 = 19','Subtract 4 from both sides','3x = 15','Divide both sides by 3','x = 5'], check:'3 × 5 + 4 = 19 ✓' }`. With `focus` set, the generator retries (up to 10 times) until the question has a trap for that misconception, so it can actually show it.
@@ -108,12 +114,14 @@ Design choice: for an anxious learner, a wrong "correct answer" or confusing fee
 - *Fallback:* if a focus trap cannot be generated, a normal question of the same skill is used.
 
 **2. Misconception diagnosis** (`src/lib/diagnose.js → diagnose(q, response)`)
+
 - *Input:* the question with its traps, and the learner's response (e.g. `{ value: '17' }` for x + 5 = 12).
 - *Output:* `'correct' | 'M1' | 'M2' | 'M3' | 'unknown'`. Here: `'M1'` because the M1 trap for x + 5 = 12 is 17.
 - *Check:* only exact matches to a computed trap are labelled as a misconception. Anything else is `'unknown'`, which leads to the safe move (prerequisite refresher), never to a wrong targeted explanation.
 - *Fallback / wrong diagnosis:* the teacher sees every diagnosis in the attempt log and can override the focus and level.
 
 **3. Adaptive decision rule** (`src/lib/tutor.js → decide(state, verdict, explained)`) — the P4 design challenge
+
 | Condition | Next move |
 |---|---|
 | Correct (and explanation not "unclear" when one is asked) **2 in a row** | **Harder question** (level + 1) |
@@ -123,6 +131,7 @@ Design choice: for an anxious learner, a wrong "correct answer" or confusing fee
 Each move is shown to the learner with its reason ("Why this next step?"). All three outcomes appear in D5: a05 (harder), b05 (alternative), b07 (prerequisite).
 
 **4. Explanation checker** (`checkExplanation(q, text, choice)`)
+
 - *What it does:* reads the learner's one-line reason on check / spot-the-error tasks and gives point-by-point feedback built from what she actually wrote.
 - *Input (actual example):* 3x = 12, claimed x = 9, choice "no", text "3*9=21 not 12".
 - *Rules:* pulls the numbers out of the text, then checks the steps of a substitution check: (1) did she put the claimed x back in, (2) is her left-side value correct (a × claimed + b), (3) did she compare with the right side, (4) does the reason agree with her Yes/No. Giving the correct x when the claim is wrong ("No, x should be 4") also counts as a valid reason. If that number also appears in the equation, the checker needs "x = 4" or an operation word.
@@ -133,6 +142,13 @@ Each move is shown to the learner with its reason ("Why this next step?"). All t
 **Possible LLM extension (not deployed):** the explanation checker could call an LLM with: *"You are a Class 8 maths teacher. Equation: {expr}. Correct x: {x}. Student's claim: {choice}. Student's reason: '{text}'. Reply in JSON {quality: strong|partial|unclear, misconception: M1|M2|M3|none, feedback: ≤ 25 simple words, no new method}."* Its output would be validated by JSON schema, would have to agree with the rule-based verdict, would go into the same teacher review queue, and would fall back to the rule-based feedback on timeout or disagreement.
 
 ## D7 · Pedagogical rationale
+
+- **Answer to the P4 design challenge: how does the tutor choose between a harder question, an alternative explanation and prerequisite instruction?** It uses one rule, applied after every answer (`decide()` in `src/lib/tutor.js`):
+  1. **Harder question** if she has answered correctly **2 times in a row** at this level (with an acceptable reason when one is asked). Shown in D5 (a), screenshot "Correct → harder".
+  2. **Alternative explanation** if her wrong answer **matches a known misconception** (it equals the answer M1/M2/M3 would give) **for the first time**. She gets a different representation of that one idea (tilted balance + refutation text) and a similar item on it. Shown in D5 (b), "Alternative explanation".
+  3. **Prerequisite instruction** if the error is **unrecognised**, or the **same misconception comes back right after its alternative explanation**: the explanation did not work, so we step back to opposite operations and drop a level. Shown in D5 (b), "Same M1 again → refresher".
+
+  The learner always sees the reason ("Why this next step?"), and the teacher can override the level and focus (C5).
 - **Diagnose, then target (P4).** Every generated item carries the answers its misconceptions would produce, so a wrong answer becomes evidence of a specific idea. This is error analysis, not right/wrong marking. The three-way decision rule moves the learner up (mastery: 2 in a row), sideways (an alternative representation of the same idea) or back (prerequisite), which keeps her in her zone of proximal development.
 - **Balance as the central representation.** Concrete → pictorial → symbolic (Bruner). Instead of "wrong", the app substitutes the learner's own value and shows a **tilted balance** ("23 + 8 = 31, not 15"). This creates cognitive conflict from her own answer. It also models the check-by-substitution habit (Outcome 3).
 - **Refutation text.** Each alternative explanation names the faulty rule ("Change side, change sign" is only shorthand for doing the opposite on both sides) and replaces it.
@@ -143,6 +159,7 @@ Each move is shown to the learner with its reason ("Why this next step?"). All t
 - **Accessibility:** 48 px tap targets, labelled inputs, radio roles, focus moves to each new heading, skip link, high-contrast colours.
 
 ## D8 · Evaluation plan
+
 | Outcome | Assessment | Log data | Success |
 |---|---|---|---|
 | 1 Solve | Pre/post test: 10 mixed one/two-step equations (paper or in-app Level 1–2) | verdict per item, level reached, attempts to level-up | ≥ 80 % on post-test and +30 percentage points over pre-test; reaches Level 3 within 2 sessions |
@@ -155,6 +172,7 @@ Small study: 10–15 repeat learners, 3 sessions over a week. Teacher interview 
 
 ## AI-use log and reflection
 **Log (in order):**
+
 1. Claude (Anthropic), this chat, used for card selection, design, all code, testing, screenshots and this report draft. Share link: https://claude.ai/share/3dd6af72-8f16-4a3a-b6e1-e40f86af5c1c
 
 **Reflection.** I used Claude as the developer: I gave the brief and made the decisions, and Claude wrote and tested the code in small commits. Decisions that were mine: the card (P4, L5, C5), switching the topic from Integers (T1) to Linear equations (T3) at 18:17 before the first deploy, and no paid AI API. The AI caught a card mismatch I made (I first chose the pendulum topic, which belongs to P5, not P4). Testing caught real bugs that I checked: the balance tilted the wrong way, and the alternative explanation quoted fixed numbers instead of the question's own. I avoided an LLM for feedback the learner sees directly because an anxious learner should not get confidently wrong feedback. Generation is deterministic, and the one open-ended judgement goes to the teacher. Limitations: the explanation checker is keyword-based, so it can rate a vague answer "partial", which is why every explanation goes through the teacher queue. Teacher and learner share one device's storage; a real deployment would need a small backend to sync them.
