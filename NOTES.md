@@ -18,6 +18,7 @@ Riya Pawar, 13, Class 7, Pune municipal school, repeating integers after failing
 | 5 | Learn screen (4 short steps) | Cognitive load (one idea per screen), signalling with highlights, conversational style (Mayer) |
 | 7 | Diagnostic: 3 warm-ups + confidence → start level & first focus | Profile adaptivity (rubric P13); affect-aware start for anxious learner |
 | 8 | Prerequisite refresher (opposites) + Summary in words, not % | Prerequisite sequencing (Gagné); attribution / growth framing for L5 |
+| 9 | Teacher view (PIN): progress, misconception counts, approve/override explanation feedback, override level/focus, attempt log | C5; human-in-the-loop check on automated feedback; teacher as orchestrator |
 | 6 | Practice + Feedback (5 formats, hint without penalty, "Why this next step?") | Formative feedback (Hattie), refutation text for M1/M2, transparency of adaptivity |
 
 ## File map
@@ -35,6 +36,8 @@ Riya Pawar, 13, Class 7, Pune municipal school, repeating integers after failing
 - A wrong answer is matched against each misconception's predicted answer (e.g. (−3)+(−5) → M1 predicts +8). That is what makes the diagnosis specific instead of "wrong".
 - Same misconception twice → prerequisite (alternative explanation didn't work, so go one step back).
 - Number-line input limited to −10..10 so taps fit a 360 px phone; ◀ ▶ buttons for keyboard/low-precision users.
+- Every free-text explanation's automated feedback enters a teacher review queue (pending → approved / overridden). Overridden text is shown to the learner with a "Your teacher reviewed" note. Teacher can also override the decision rule (level / focus).
+- Teacher and learner share one device's localStorage (no backend); in a real school this would sync via a server. Demo PIN 617 is shown on purpose.
 - Single localStorage object → whole app state can be resumed or reset in one place.
 
 ## AI-usage note

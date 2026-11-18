@@ -8,6 +8,7 @@ import Feedback from './screens/Feedback.jsx'
 import Diagnostic from './screens/Diagnostic.jsx'
 import Prereq from './screens/Prereq.jsx'
 import Summary from './screens/Summary.jsx'
+import Teacher from './screens/Teacher.jsx'
 
 import { ROLL } from './lib/config.js'
 
@@ -34,6 +35,7 @@ export default function App() {
     diagnostic: <Diagnostic {...props} />,
     prereq: <Prereq {...props} />,
     summary: <Summary {...props} />,
+    teacher: <Teacher {...props} />,
   }
 
   return (

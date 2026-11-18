@@ -67,3 +67,8 @@ mark { background: #ffe68a; padding: 0 3px; border-radius: 3px; }
 .signs .btn { flex: 0 0 auto; width: auto; }
 .steps { padding-left: 20px; }
 .steps li { margin-bottom: 6px; }
+.field select { display: block; width: 100%; margin-top: 4px; min-height: 44px; font: inherit; border: 2px solid var(--line); border-radius: 8px; background: #fff; }
+.row .field { flex: 1; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.85rem; }
+th, td { border-bottom: 1px solid var(--line); padding: 6px; text-align: left; vertical-align: top; }
