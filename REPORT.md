@@ -155,6 +155,6 @@ Small study: 10–15 repeat learners, 3 sessions over a week. Teacher interview 
 
 ## AI-use log and reflection
 **Log (in order):**
-1. Claude (Anthropic), this chat, used for card selection, design, all code, testing, screenshots and this report draft. Share link: *(add link)*
+1. Claude (Anthropic), this chat, used for card selection, design, all code, testing, screenshots and this report draft. Share link: https://claude.ai/share/3dd6af72-8f16-4a3a-b6e1-e40f86af5c1c
 
 **Reflection.** I used Claude as the developer: I gave the brief and made the decisions, and Claude wrote and tested the code in small commits. Decisions that were mine: the card (P4, L5, C5), switching the topic from Integers (T1) to Linear equations (T3) at 18:17 before the first deploy, and no paid AI API. The AI caught a card mismatch I made (I first chose the pendulum topic, which belongs to P5, not P4). Testing caught real bugs that I checked: the balance tilted the wrong way, and the alternative explanation quoted fixed numbers instead of the question's own. I avoided an LLM for feedback the learner sees directly because an anxious learner should not get confidently wrong feedback. Generation is deterministic, and the one open-ended judgement goes to the teacher. Limitations: the explanation checker is keyword-based, so it can rate a vague answer "partial", which is why every explanation goes through the teacher queue. Teacher and learner share one device's storage; a real deployment would need a small backend to sync them.
