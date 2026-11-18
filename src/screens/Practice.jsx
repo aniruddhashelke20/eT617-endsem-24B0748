@@ -77,7 +77,7 @@ function QuestionCard({ q, state, update }) {
         <div key={e.id} className="box info" role="status">
           <strong>📝 Your teacher reviewed one of your answers</strong>
           <p><strong>Question:</strong> {e.question}</p>
-          <p><strong>You answered:</strong> {e.choice === 'yes' ? 'Yes' : 'No'} · <strong>Your reason:</strong> “{e.reason || '—'}”</p>
+          <p><strong>You answered:</strong> {e.choice ? <>{e.choice === 'yes' ? 'Yes' : 'No'} · <strong>Your reason:</strong> “{e.reason || '—'}”</> : e.response}</p>
           <p><strong>Teacher:</strong> {e.review.text}</p>
           <button className="btn" onClick={() => update({ log: state.log.map((x) => (x.id === e.id ? { ...x, review: { ...x.review, seen: true } } : x)) })}>Got it</button>
         </div>
