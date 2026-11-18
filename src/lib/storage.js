@@ -12,7 +12,8 @@ export const initialState = {
   focus: null, // misconception to target next
   altShownFor: null, // misconception that already got an alternative explanation
   hintsInRow: 0,
-  retry: null, // { skill, verdict } after a first wrong answer on a concept
+  pair: null, // { skill, first } after the 1st question of a same-concept pair
+  note: null, // neutral note shown on the next question
   retrySkill: null, // concept to ask again
   diagnostic: null, // { score, confidence, startLevel }
   counts: { M1: 0, M2: 0, M3: 0 },

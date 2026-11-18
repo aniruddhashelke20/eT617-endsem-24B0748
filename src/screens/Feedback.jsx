@@ -1,7 +1,7 @@
 import Balance, { sides } from '../components/Balance.jsx'
 import { show } from '../lib/generator.js'
 import { solutionText, alternativeFor, backCheck, parseNum } from '../lib/diagnose.js'
-import { MOVE_REASON } from '../lib/tutor.js'
+import { MOVE_REASON, CONCEPT } from '../lib/tutor.js'
 import { encouragement } from '../lib/encourage.js'
 
 // Shows the result and the tutor's next move (harder / alternative / prerequisite).
@@ -26,8 +26,8 @@ export default function Feedback({ state, go, update }) {
 
   return (
     <section className="card">
-      <div className={`box ${ok ? 'ok' : 'warn'}`} role="status">
-        <strong>{ok && weakReason ? '✓ Right answer — now let us make your reason complete.' : ok ? '✓ Correct!' : '↻ Not yet — let us look again.'}</strong>
+      <div className="box info" role="status">
+        <strong>📘 Let us look at this idea together: {CONCEPT[q.skill]}</strong>
         {q.format === 'blank' && <p><strong>{q.blankAnswer}</strong></p>}
         {q.format === 'findstep' && <p><strong>{q.fix}</strong></p>}
         <p>{ok ? solutionText(q) : <>You answered <strong>{yours}</strong>.{retry && q.format !== 'blank' && q.format !== 'findstep' && <> The answer was <strong>{q.format === 'step' ? q.stepAnswer : (q.trueValue !== undefined && (q.format === 'spot' || q.format === 'check')) ? `${q.answer === 'yes' ? 'Yes' : 'No'} (x = ${show(q.trueValue)})` : `x = ${show(q.answer)}`}</strong>.</>}</>}</p>
@@ -41,7 +41,7 @@ export default function Feedback({ state, go, update }) {
         </>
       )}
 
-      {expl && (
+      {false && expl && (
         <div className="box info">
           <span className="badge">Checking your reason · your teacher will also see this</span>
           <p className="muted">You wrote: “{response.text || '—'}”</p>
@@ -65,7 +65,7 @@ export default function Feedback({ state, go, update }) {
       ) : move === 'mastered' ? (
         <button className="btn primary" onClick={() => go('summary')}>See what I learned</button>
       ) : (
-        <button className="btn primary" onClick={() => update({ screen: 'practice', feedback: null })}>
+        <button className="btn primary" onClick={() => update({ screen: 'practice', feedback: null, note: null })}>
           {move === 'alternative' ? 'Try a similar one' : move === 'retry' ? 'Try another like this' : move === 'harder' ? 'Next (a bit harder)' : 'Next question'}
         </button>
       )}

@@ -1,11 +1,12 @@
 // THE ADAPTIVE DECISION RULE (P4 design challenge) — viva version
-// Questions belong to CONCEPTS (skill): undoing + / −, undoing × / ÷, two-step equations.
-//  correct, LEVEL_UP in a row                 -> HARDER question (level up)
-//  1st wrong on a concept                     -> RETRY: one more question of the SAME concept, no teaching yet
-//  retry correct                              -> carry on, no teaching (it was a slip)
-//  retry wrong too (2 wrong on that concept)  -> TEACH that concept:
+// Questions come in PAIRS of the same CONCEPT (skill): undoing + / −, undoing × / ÷, two-step equations.
+// No right/wrong is shown after each answer; answers are just saved.
+//  after the 1st question of a pair            -> ask a 2nd question of the SAME concept
+//  after the 2nd: both wrong                   -> TEACH that concept
 //        known misconception, not yet explained -> ALTERNATIVE explanation of that misconception
 //        unrecognised, or already explained     -> PREREQUISITE lesson, easier level
+//  after the 2nd: at least one right           -> no teaching, new question
+//  LEVEL_UP correct answers in a row           -> HARDER level
 export const LEVEL_UP = 6
 
 export const CONCEPT = {
@@ -15,41 +16,46 @@ export const CONCEPT = {
 }
 
 export function decide(state, verdict, explained = true, skill = null) {
-  const retry = state.retry // { skill, verdict } after a first wrong answer, else null
+  const right = verdict === 'correct' && explained
+  let streak = right ? state.streak + 1 : 0
+  let level = state.level
+  let levelled = false
+  if (streak >= LEVEL_UP) {
+    streak = 0
+    if (level < 3) { level += 1; levelled = true } else return { move: 'mastered', patch: { streak, pair: null, retrySkill: null } }
+  }
+  const base = { streak, level }
 
-  if (verdict === 'correct') {
-    const streak = explained ? state.streak + 1 : state.streak
-    const base = { retry: null, retrySkill: null }
-    if (streak >= LEVEL_UP) {
-      if (state.level >= 3) return { move: 'mastered', patch: { ...base, streak: 0, focus: null, altShownFor: null } }
-      return { move: 'harder', patch: { ...base, level: state.level + 1, streak: 0, focus: null, altShownFor: null } }
-    }
-    return { move: retry ? 'recovered' : 'next', patch: { ...base, streak, focus: null } }
+  // 1st question of a pair: save it and ask another of the same concept
+  if (!state.pair) {
+    return { move: levelled ? 'harder' : 'pairNext', patch: { ...base, pair: { skill, first: verdict }, retrySkill: skill } }
   }
 
-  // First wrong answer on this concept: ask one more of the same concept before teaching
-  if (!retry) {
-    return { move: 'retry', patch: { streak: 0, retry: { skill, verdict }, retrySkill: skill } }
-  }
+  // 2nd question of the pair
+  const clear = { ...base, pair: null, retrySkill: null }
+  const bothWrong = state.pair.first !== 'correct' && verdict !== 'correct'
+  if (!bothWrong) return { move: levelled ? 'harder' : 'next', patch: { ...clear, focus: null } }
 
-  // Second wrong answer on the same concept -> teach it
-  const m = verdict !== 'unknown' ? verdict : retry.verdict !== 'unknown' ? retry.verdict : 'unknown'
-  const clear = { streak: 0, retry: null, retrySkill: null }
+  const prev = state.pair.first
+  const m = verdict !== 'unknown' ? verdict : prev !== 'unknown' ? prev : 'unknown'
   if (m !== 'unknown' && state.altShownFor !== m) {
-    return { move: 'alternative', patch: { ...clear, focus: m, altShownFor: m } }
+    return { move: 'alternative', patch: { ...clear, streak: 0, focus: m, altShownFor: m } }
   }
   return {
     move: 'prerequisite',
-    patch: { ...clear, level: Math.max(1, state.level - 1), altShownFor: null, focus: m === 'unknown' ? null : m },
+    patch: { ...clear, streak: 0, level: Math.max(1, state.level - 1), altShownFor: null, focus: m === 'unknown' ? null : m },
   }
 }
 
+// Short neutral notes shown on the next question (no right/wrong)
+export const MOVE_NOTE = {
+  pairNext: 'Answer saved. Here is one more on the same idea.',
+  next: 'Answer saved. On to a new question.',
+  harder: `Level up! ${LEVEL_UP} in a row — the questions get a bit harder now.`,
+}
+
 export const MOVE_REASON = {
-  next: `Keep going — ${LEVEL_UP} correct in a row moves you up a level.`,
-  recovered: 'You got the second one right, so that first one was just a slip. No lesson needed!',
-  retry: 'One mistake is okay. Let us try one more of the same kind before changing anything.',
-  harder: `You got ${LEVEL_UP} in a row right, so the next questions are a bit harder.`,
+  alternative: 'Both answers on this idea matched a common mix-up, so here is another way to see it.',
+  prerequisite: 'Both answers on this idea were not right yet, so let us warm up one basic idea first.',
   mastered: 'You cleared the top level!',
-  alternative: 'Two answers on this idea matched a common mix-up, so here is another way to see it.',
-  prerequisite: 'Two answers on this idea were not right yet, so let us warm up one basic idea first.',
 }

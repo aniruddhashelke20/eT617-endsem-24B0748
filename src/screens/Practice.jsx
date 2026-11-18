@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Balance, { sides } from '../components/Balance.jsx'
 import { generateQuestion, show } from '../lib/generator.js'
 import { diagnose, checkExplanation } from '../lib/diagnose.js'
-import { decide, LEVEL_UP, CONCEPT } from '../lib/tutor.js'
+import { decide, CONCEPT, MOVE_NOTE } from '../lib/tutor.js'
 
 const LEVEL_NAME = { 1: 'Level 1 · one-step', 2: 'Level 2 · two-step', 3: 'Level 3 · check & spot the error' }
 
@@ -51,14 +51,18 @@ function QuestionCard({ q, state, update }) {
     const counts = { ...state.counts }
     if (counts[verdict] !== undefined) counts[verdict]++
 
+    // No right/wrong after each answer: stay on practice with a neutral note,
+    // and only open the Feedback screen when a concept is being taught (2 wrong in a pair).
+    const teach = move === 'alternative' || move === 'prerequisite'
     update({
       ...patch,
       counts,
       hintsInRow: hints > 0 ? state.hintsInRow + 1 : 0,
       log: [...state.log, entry],
-      feedback: { q, verdict, move, response, expl },
+      feedback: teach ? { q, verdict, move, response, expl } : null,
+      note: MOVE_NOTE[move] ?? null,
       current: null,
-      screen: 'feedback',
+      screen: teach ? 'feedback' : move === 'mastered' ? 'summary' : 'practice',
     })
   }
 
@@ -71,9 +75,11 @@ function QuestionCard({ q, state, update }) {
   return (
     <section className="card">
       <p className="muted">
-        {LEVEL_NAME[q.level]} · {state.streak}/{LEVEL_UP} in a row · <span className="badge">{CONCEPT[q.skill]}</span>
+        {LEVEL_NAME[q.level]} · <span className="badge">{CONCEPT[q.skill]}</span>
         {state.retrySkill && <> · <span className="badge">one more of the same kind</span></>}
       </p>
+
+      {state.note && <p className="box info" role="status">{state.note}</p>}
 
       {teacherNotes.map((e) => (
         <div key={e.id} className="box info" role="status">
