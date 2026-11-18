@@ -55,3 +55,15 @@ h2 { font-size: 1.15rem; margin: 16px 0 8px; }
 .box.info { background: var(--info-bg); border-color: var(--primary); }
 .badge { display: inline-block; font-size: 0.8rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--info-bg); color: var(--primary); }
 mark { background: #ffe68a; padding: 0 3px; border-radius: 3px; }
+
+.numberline { margin: 12px 0; }
+.numberline svg { width: 100%; height: auto; display: block; touch-action: manipulation; }
+.numberline figcaption { margin-top: 4px; }
+.nl-value { flex: 0 0 64px; align-self: center; text-align: center; font-size: 1.4rem; font-weight: 700; margin-top: 10px; }
+.question { font-size: 1.2rem; }
+.expr { display: block; font-size: 2rem; margin-top: 6px; letter-spacing: 0.5px; }
+.options { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; }
+.option.selected { background: var(--info-bg); border-width: 3px; }
+.signs .btn { flex: 0 0 auto; width: auto; }
+.steps { padding-left: 20px; }
+.steps li { margin-bottom: 6px; }

@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { loadState, saveState, clearState, initialState } from './lib/storage.js'
 import Welcome from './screens/Welcome.jsx'
 import About from './screens/About.jsx'
+import Learn from './screens/Learn.jsx'
+import Practice from './screens/Practice.jsx'
+import Feedback from './screens/Feedback.jsx'
 
 import { ROLL } from './lib/config.js'
 
@@ -22,6 +25,9 @@ export default function App() {
   const screens = {
     welcome: <Welcome {...props} />,
     about: <About {...props} />,
+    learn: <Learn {...props} />,
+    practice: <Practice {...props} />,
+    feedback: <Feedback {...props} />,
   }
 
   return (

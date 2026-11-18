@@ -12,15 +12,27 @@ Riya Pawar, 13, Class 7, Pune municipal school, repeating integers after failing
 | # | Feature | Theory |
 |---|---|---|
 | 1 | App shell, resume, calm welcome, roll no. footer | Affective filter / self-efficacy (Bandura): no timer, private, "mistakes are fine" |
+| 2 | Question generator with misconception "traps" | Diagnostic assessment; error analysis (misconceptions as data, not just wrong) |
+| 3 | Decision rule: harder / alternative explanation / prerequisite | Adaptive tutoring, ZPD (Vygotsky), mastery learning (Bloom): 2-in-a-row to level up |
+| 4 | Number line (display + tap input + ◀ ▶) | Concrete→representational (Bruner); dual coding (words + picture); topic-specific tool (rubric T6) |
+| 5 | Learn screen (4 short steps) | Cognitive load (one idea per screen), signalling with highlights, conversational style (Mayer) |
+| 6 | Practice + Feedback (5 formats, hint without penalty, "Why this next step?") | Formative feedback (Hattie), refutation text for M1/M2, transparency of adaptivity |
 
 ## File map
 - `src/App.jsx` – screen state machine + header/footer
 - `src/lib/storage.js` – one localStorage object, save on every change (resume)
 - `src/lib/config.js` – roll number
-- `src/screens/*` – one file per screen
+- `src/lib/generator.js` – question templates × level × focus misconception; each question stores `traps`
+- `src/lib/diagnose.js` – correct / M1 / M2 / M3 / unknown; walk text; alternative explanations; explanation checker
+- `src/lib/tutor.js` – **the decision rule** (`decide`) + reason shown to learner
+- `src/components/NumberLine.jsx` – SVG number line, hops, tap/◀▶ input
+- `src/screens/*` – one file per screen (Welcome, Learn, Practice, Feedback, About …)
 
 ## Decisions
 - No backend / no API key: question generation and feedback are rule-based in the browser, so it works offline and is fully explainable in the viva. Teacher review (C5) is the safety check on automated feedback.
+- A wrong answer is matched against each misconception's predicted answer (e.g. (−3)+(−5) → M1 predicts +8). That is what makes the diagnosis specific instead of "wrong".
+- Same misconception twice → prerequisite (alternative explanation didn't work, so go one step back).
+- Number-line input limited to −10..10 so taps fit a 360 px phone; ◀ ▶ buttons for keyboard/low-precision users.
 - Single localStorage object → whole app state can be resumed or reset in one place.
 
 ## AI-usage note
