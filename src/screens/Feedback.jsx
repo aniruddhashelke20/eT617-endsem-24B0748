@@ -2,6 +2,7 @@ import Balance, { sides } from '../components/Balance.jsx'
 import { show } from '../lib/generator.js'
 import { solutionText, alternativeFor, backCheck, parseNum } from '../lib/diagnose.js'
 import { MOVE_REASON } from '../lib/tutor.js'
+import { encouragement } from '../lib/encourage.js'
 
 // Shows the result and the tutor's next move (harder / alternative / prerequisite).
 // Anxious learner: "Not yet", never a red cross; icon + words, never colour alone.
@@ -19,6 +20,7 @@ export default function Feedback({ state, go, update }) {
   const showTilt = !ok && wrongVal !== null && wrongVal !== (q.trueValue ?? q.answer)
   const { left, right } = sides(q.expr)
   const filled = left.replace(/(\d*)x/, (_, a) => (a ? `${a} × (${show(wrongVal)})` : `(${show(wrongVal)})`))
+  const cheer = encouragement({ verdict, move, log: state.log, id: q.id })
   const yours = yesNo ? response.choice : q.format === 'step' || q.format === 'blank' || q.format === 'findstep' ? response.value : `x = ${wrongVal === null ? response.value : show(wrongVal)}`
 
   return (
@@ -29,6 +31,7 @@ export default function Feedback({ state, go, update }) {
         {q.format === 'findstep' && <p><strong>{q.fix}</strong></p>}
         <p>{ok ? solutionText(q) : <>You answered <strong>{yours}</strong>.</>}</p>
       </div>
+      {cheer && <p className="cheer" role="status">💪 {cheer}</p>}
 
       {showTilt && (
         <>

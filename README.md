@@ -45,6 +45,7 @@ Riya Pawar, 14, Class 8, repeating linear equations after failing (8/25). **M1**
 | 8 | Refresher (opposite operations) + Summary in words not % | Prerequisite sequencing (Gagné); growth framing for L5 |
 | 10 | Fill-in-the-blanks ("To undo division by 4, we ____ both sides by __") with a free-text operation word (synonyms accepted) + number | Recall of the inverse-operation rule in words (generation effect); blank answers are diagnosed (wrong inverse → M1/M2) |
 | 11 | Find the mistake: worked 2-step solution, choose Step 1 / Step 2 / No mistake (mistake is M1 in step 1, M2 in step 2, or none) | Error analysis of worked examples (Große & Renkl): learners judge each step against the balance rule; "No mistake" on a faulty step reveals the misconception |
+| 12 | Encouraging messages after a wrong answer (by situation: first mix-up / repeated / other) + "comeback" praise after a fix, naming problems already solved | Self-efficacy (Bandura: verbal persuasion, mastery experience), growth mindset (Dweck: praise effort and strategy), attribution retraining |
 | 9 | Teacher view: progress, approve/override feedback, override level/focus, log | C5 human-in-the-loop; teacher as orchestrator |
 
 ## File map
@@ -66,6 +67,8 @@ Riya Pawar, 14, Class 8, repeating linear equations after failing (8/25). **M1**
 - 19:14 – a strong reason now just gets "✓ Good reasoning!" (no checklist). Added the fill-in-the-blanks format at Levels 1–2, including x ÷ a = c items with their own alternative explanation.
 - 19:19 – answering "No" and giving the correct x ("x should be 4", "x = 4", or just "4") now counts as a valid reason. If that number also appears in the equation (4x = 16 → x = 4), the checker needs "x = 4" / "it's 4" or an operation word, so a copied coefficient is not credited.
 - 19:20 – added the find-the-mistake format (Levels 2–3). About ⅓ of items have no mistake, so the learner has to check each step instead of assuming one is wrong.
+- 19:26 – encouraging messages for L5 in `src/lib/encourage.js`: normalise the mistake ("one of the most common mix-ups"), praise sticking with it, name progress ("You have already solved 5 today"), and praise a comeback. Chosen deterministically from the question id, so the same situation always shows the same line.
+- **Feature freeze 19:30.**
 - Learner and teacher share one device's localStorage (no backend); in a real school this would sync to a server. Demo PIN 617 shown on purpose.
 
 ## AI-usage note

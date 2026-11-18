@@ -84,3 +84,4 @@ h1:focus { outline: none; }
 .blank.wide { width: 130px; }
 .worked { list-style: none; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
 .worked li { margin: 6px 0; }
+.cheer { font-weight: 600; color: var(--ink); background: #fff8e6; border-radius: 10px; padding: 10px 12px; }
