@@ -78,3 +78,4 @@ th, td { border-bottom: 1px solid var(--line); padding: 6px; text-align: left; v
 .skip:focus { left: 8px; top: 8px; background: #fff; padding: 8px; z-index: 10; }
 h1:focus { outline: none; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+.pre { white-space: pre-line; }

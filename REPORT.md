@@ -116,12 +116,13 @@ Design choice: for an anxious learner, a wrong "correct answer" or confusing fee
 
 Each move is shown to the learner with its reason ("Why this next step?"). All three outcomes appear in D5: a05 (harder), b05 (alternative), b07 (prerequisite).
 
-**4. Explanation checker** (`checkExplanation(q, text)`)
-- *Input (actual example):* text "put x = 9 back in: 2*9+3 = 21 not 11 so not balanced".
-- *Rules:* looks for a balance/check idea (`both sides | balance | opposite | substitute | put … back | check`) AND an operation, the correct value, or a worked calculation (`9+3 = 21`).
-- *Output:* `{ quality: 'strong' | 'partial' | 'unclear', feedback }`, here `'strong'`: "Clear reason — you used the balance idea…"
-- *Check before the learner sees it:* the feedback is labelled "Tutor's quick check · your teacher will review". Every explanation enters the teacher's **review queue** (pending → approved / overridden). An "unclear" rating never marks the answer wrong; it only stops the streak from counting.
-- *Fallback when wrong:* the teacher overrides it with their own words, and the learner sees the teacher's note on the next question.
+**4. Explanation checker** (`checkExplanation(q, text, choice)`)
+- *What it does:* reads the learner's one-line reason on check / spot-the-error tasks and gives point-by-point feedback built from what she actually wrote.
+- *Input (actual example):* 3x = 12, claimed x = 9, choice "no", text "3*9=21 not 12".
+- *Rules:* pulls the numbers out of the text, then checks the steps of a substitution check: (1) did she put the claimed x back in, (2) is her left-side value correct (a × claimed + b), (3) did she compare with the right side, (4) does the reason agree with her Yes/No. Solving the equation herself (correct x + an operation word) also counts.
+- *Output (actual):* `quality: 'partial'` with "✓ You put x = 9 back in. ↻ Check the left side: 3 × 9 = 27. ✓ You compared it with the right side (12)." It is `strong` only if all steps are right (or she solved it correctly) and the reason agrees with her answer.
+- *Check before the learner sees it:* her own text is shown above the feedback ("You wrote: …"), labelled "Checking your reason · your teacher will also see this". Every item goes to the teacher's **review queue** (pending → approved / overridden). A correct Yes/No with an unclear reason is shown as "Right answer — now let us make your reason complete" and does not count towards levelling up.
+- *Fallback when wrong:* the teacher overrides it in their own words, and the learner sees the teacher's note on her next question.
 
 **Possible LLM extension (not deployed):** the explanation checker could call an LLM with: *"You are a Class 8 maths teacher. Equation: {expr}. Correct x: {x}. Student's claim: {choice}. Student's reason: '{text}'. Reply in JSON {quality: strong|partial|unclear, misconception: M1|M2|M3|none, feedback: ≤ 25 simple words, no new method}."* Its output would be validated by JSON schema, would have to agree with the rule-based verdict, would go into the same teacher review queue, and would fall back to the rule-based feedback on timeout or disagreement.
 

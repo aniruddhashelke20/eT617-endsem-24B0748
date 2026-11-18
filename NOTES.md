@@ -36,6 +36,7 @@ Riya Pawar, 14, Class 8, repeating linear equations after failing (8/25). **M1**
 - A wrong answer is matched against each misconception's predicted answer (x + 5 = 12: M1 predicts 17). That makes diagnosis specific instead of just "wrong".
 - Same misconception twice → prerequisite (the alternative explanation didn't work, so step back one level).
 - Wrong value is substituted back and shown on a tilted balance: the learner sees *why* it is wrong without being told "wrong" — less threatening for L5.
+- 18:50 – explanation checker rewritten after my test: it used to return one of three fixed messages from keywords. Now it checks the substitution steps (claimed x used? left side computed right? compared with right side? reason agrees with Yes/No?) and builds ✓/↻ feedback from the learner's own numbers. A right Yes/No with no real reason no longer counts towards level-up.
 - Learner and teacher share one device's localStorage (no backend); in a real school this would sync to a server. Demo PIN 617 shown on purpose.
 
 ## AI-usage note

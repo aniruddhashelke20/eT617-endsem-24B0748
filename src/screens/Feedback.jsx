@@ -14,6 +14,7 @@ export default function Feedback({ state, go, update }) {
 
   // The wrong value, put back into the equation → tilted balance (learner sees WHY it is wrong)
   const yesNo = q.format === 'check' || q.format === 'spot'
+  const weakReason = expl && expl.quality !== 'strong'
   const wrongVal = yesNo ? q.claimed : q.format === 'step' ? null : parseNum(response.value)
   const showTilt = !ok && wrongVal !== null && wrongVal !== (q.trueValue ?? q.answer)
   const { left, right } = sides(q.expr)
@@ -23,7 +24,7 @@ export default function Feedback({ state, go, update }) {
   return (
     <section className="card">
       <div className={`box ${ok ? 'ok' : 'warn'}`} role="status">
-        <strong>{ok ? '✓ Correct!' : '↻ Not yet — let us look again.'}</strong>
+        <strong>{ok && weakReason ? '✓ Right answer — now let us make your reason complete.' : ok ? '✓ Correct!' : '↻ Not yet — let us look again.'}</strong>
         <p>{ok ? solutionText(q) : <>You answered <strong>{yours}</strong>.</>}</p>
       </div>
 
@@ -36,8 +37,10 @@ export default function Feedback({ state, go, update }) {
 
       {expl && (
         <div className="box info">
-          <span className="badge">Tutor's quick check · your teacher will review</span>
-          <p>{expl.feedback}</p>
+          <span className="badge">Checking your reason · your teacher will also see this</span>
+          <p className="muted">You wrote: “{response.text || '—'}”</p>
+          <p className="pre">{expl.feedback}</p>
+          {ok && expl.quality === 'unclear' && <p className="muted">Your Yes/No was right, but a reason is needed for it to count towards the next level.</p>}
         </div>
       )}
 

@@ -32,7 +32,7 @@ function QuestionCard({ q, state, update }) {
   function submit() {
     const response = yesNo ? { choice, text } : { value }
     const verdict = diagnose(q, response)
-    const expl = q.needsExplanation ? checkExplanation(q, text) : null
+    const expl = q.needsExplanation ? checkExplanation(q, text, choice) : null
     const explained = !expl || expl.quality !== 'unclear'
     const { move, patch } = decide(state, verdict, explained)
 

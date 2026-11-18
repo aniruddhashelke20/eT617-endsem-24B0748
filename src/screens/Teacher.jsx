@@ -112,7 +112,7 @@ function ReviewItem({ e, onSave }) {
     <div className="box info">
       <p><strong>Q:</strong> {e.question}</p>
       <p><strong>Learner:</strong> {e.response} <span className="muted">(key: {e.correct})</span></p>
-      <p><strong>Tutor said</strong> <span className="badge">check: {e.auto.quality}</span><br />{e.auto.feedback}</p>
+      <p><strong>Tutor said</strong> <span className="badge">check: {e.auto.quality}</span></p><p className="pre">{e.auto.feedback}</p>
       {editing ? (
         <>
           <label className="field">Your feedback to the learner

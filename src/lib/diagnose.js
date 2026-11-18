@@ -78,21 +78,45 @@ export function alternativeFor(m, q) {
   }
 }
 
-// Rule-based explanation checker (the automated "AI" check that the teacher reviews)
-export function checkExplanation(q, text = '') {
-  const t = text.toLowerCase().replace(/[−–]/g, '-')
-  if (t.trim().length < 4)
-    return { quality: 'unclear', feedback: 'Try adding a short "why" — even 4 or 5 words is enough.' }
+// Explanation checker (the automated check that the teacher reviews — C5).
+// It reads the learner's own reason and checks the steps of a substitution check:
+//   1. did they put the claimed x back in?  2. is their left-side value right?
+//   3. did they compare with the right side?  4. does the reason agree with their Yes/No?
+// Solving the equation themselves (correct x + an operation) also counts as a good reason.
+// Feedback is built from what they actually wrote, point by point.
+export function checkExplanation(q, text = '', choice = null) {
+  const t = text.toLowerCase().replace(/[−–]/g, '-').replace(/×|\*/g, ' x ')
+  if (t.trim().length < 3)
+    return { quality: 'unclear', points: [], feedback: `↻ No reason yet. Try: "put x = ${show(q.claimed)} back in: … = …, so it balances / does not balance".` }
 
-  const idea = /both sides|balance|opposite|inverse|undo|substitut|put .*(back|in)|plug|check|lhs|rhs|left side|right side/.test(t)
-  const op = /subtract|minus|add|plus|divid|multipl|times|share|groups?/.test(t)
-  const target = q.trueValue ?? q.answer
-  const num = String(Math.abs(target))
-  const mentionsValue = new RegExp(`(^|[^0-9])${num}([^0-9]|$)`).test(t)
+  const nums = (t.match(/-?\d+/g) || []).map(Number)
+  const has = (n) => nums.includes(n)
+  const lhs = q.a * q.claimed + q.b
+  const leftWithX = `${q.a === 1 ? '' : q.a + ' × '}${show(q.claimed)}${q.b ? (q.b > 0 ? ' + ' + q.b : ' − ' + -q.b) : ''}`
 
-  const working = /\d\s*(=|is|gives|makes)\s*-?\d/.test(t) // e.g. "2*9+3 = 21"
-  const score = (idea ? 1 : 0) + (op || mentionsValue || working ? 1 : 0)
-  if (score >= 2) return { quality: 'strong', feedback: 'Clear reason — you used the balance idea (same step on both sides / put the answer back).' }
-  if (score === 1) return { quality: 'partial', feedback: 'Good start. Add which step you did to BOTH sides, or put x back in to check.' }
-  return { quality: 'unclear', feedback: 'I could not see a reason. Try: "put x = … back in: … = …, so it balances / does not balance".' }
+  const usedClaim = has(q.claimed) || /put .*(back|in)|substitut|plug|replace/.test(t)
+  const lhsRight = has(lhs)
+  const compared = has(q.c) || /balanc|equal|same|≠|!=|not|n't/.test(t)
+  const solved = has(q.trueValue) && /subtract|minus|add|plus|divid|multipl|both sides|opposite/.test(t)
+  const saysNo = /not|n't|≠|!=|wrong|unequal|\bno\b/.test(t)
+  const saysYes = /balanc|equal|same|correct|right|\byes\b/.test(t) && !saysNo
+  const disagrees = (choice === 'no' && saysYes) || (choice === 'yes' && saysNo)
+
+  const points = []
+  if (solved) points.push(`✓ You solved it yourself and got x = ${show(q.trueValue)} — that is a good reason.`)
+  if (usedClaim) points.push(`✓ You put x = ${show(q.claimed)} back in.`)
+  else if (!solved) points.push(`↻ Put x = ${show(q.claimed)} back into the equation.`)
+  if (usedClaim && lhsRight) points.push(`✓ Left side: ${leftWithX} = ${show(lhs)}.`)
+  else if (usedClaim) points.push(`↻ Check the left side: ${leftWithX} = ${show(lhs)}.`)
+  if (compared && (usedClaim || solved)) points.push(`✓ You compared it with the right side (${show(q.c)}).`)
+  else if (!solved) points.push(`↻ Compare it with the right side, ${show(q.c)}: ${lhs === q.c ? 'equal, so it balances' : 'not equal, so it does not balance'}.`)
+  if (disagrees) points.push('↻ Your reason and your Yes/No answer do not agree — read it again.')
+
+  const good = !disagrees && (solved || (usedClaim && lhsRight && compared))
+  const some = points.some((p) => p.startsWith('✓'))
+  return {
+    quality: good ? 'strong' : some ? 'partial' : 'unclear',
+    points,
+    feedback: points.join('\n'),
+  }
 }
